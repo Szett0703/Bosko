@@ -1,0 +1,32 @@
+<!-- Overlay (Mobile) -->
+<div
+  *ngIf="isOpen"
+  (click)="close()"
+  class="overlay"
+  aria-hidden="true">
+</div>
+
+<!-- Sidebar -->
+<aside class="sidebar" [class.sidebar-open]="isOpen">
+  <div class="sidebar-content">
+    <h2 class="sidebar-title">Categories</h2>
+
+    <nav class="sidebar-nav">
+      <a
+        *ngFor="let category of categories"
+        href="#"
+        (click)="close()"
+        class="category-link">
+        <span class="category-icon">{{ category.icon }}</span>
+        <span class="category-name">{{ category.name }}</span>
+      </a>
+    </nav>
+
+    <!-- Promotional Banner -->
+    <div class="promo-banner">
+      <h3 class="promo-title">Special Offer!</h3>
+      <p class="promo-text">Get 20% off on your first order</p>
+      <button class="promo-btn">Shop Now</button>
+    </div>
+  </div>
+</aside>

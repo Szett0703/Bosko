@@ -1,0 +1,47 @@
+<header class="header">
+  <div class="header-container">
+    <div class="header-content">
+      <!-- Hamburger Menu Button (Mobile) -->
+      <button
+        (click)="toggleSidebar()"
+        class="hamburger-btn sidebar-toggle"
+        aria-label="Toggle sidebar menu">
+        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+
+      <!-- Brand Logo/Name -->
+      <div class="brand">
+        <h1 class="brand-name">BOSKO</h1>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <nav class="desktop-nav">
+        <a href="#" class="nav-link">Home</a>
+        <a href="#" class="nav-link">Collections</a>
+        <a href="#" class="nav-link">About</a>
+        <a href="#" class="nav-link">Contact Us</a>
+      </nav>
+
+      <!-- Mobile Menu Toggle -->
+      <button
+        (click)="toggleMobileMenu()"
+        class="hamburger-btn menu-toggle"
+        aria-label="Toggle navigation menu">
+        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path *ngIf="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          <path *ngIf="isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Navigation Dropdown -->
+    <nav *ngIf="isMobileMenuOpen" class="mobile-nav">
+      <a href="#" class="mobile-nav-link">Home</a>
+      <a href="#" class="mobile-nav-link">Collections</a>
+      <a href="#" class="mobile-nav-link">About</a>
+      <a href="#" class="mobile-nav-link">Contact Us</a>
+    </nav>
+  </div>
+</header>
