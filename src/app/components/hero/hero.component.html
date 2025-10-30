@@ -1,25 +1,29 @@
 <section class="hero">
   <div class="hero-container">
     <div class="hero-content">
+      <!-- New Season Badge -->
+      <div class="hero-badge">
+        {{ t().hero.badge }}
+      </div>
+
       <!-- Main Heading -->
       <h1 class="hero-title">
-        New Winter Collection 2025
+        {{ t().hero.title }}
       </h1>
-
-      <!-- Subheading -->
-      <p class="hero-subtitle">
-        Out Now!
-      </p>
 
       <!-- Description -->
       <p class="hero-description">
-        Discover the latest trends in fashion. Stay warm and stylish with our exclusive winter collection.
+        {{ t().hero.subtitle }}
       </p>
 
       <!-- Call-to-Action Buttons -->
       <div class="hero-buttons">
-        <button class="btn btn-primary">Shop Now</button>
-        <button class="btn btn-secondary">Explore Collection</button>
+        <button class="btn btn-primary" (click)="shopNow()">
+          {{ t().hero.ctaPrimary }}
+        </button>
+        <button class="btn btn-secondary" (click)="shopNow()">
+          {{ t().hero.ctaSecondary }}
+        </button>
       </div>
     </div>
   </div>

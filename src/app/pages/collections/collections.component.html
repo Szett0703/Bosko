@@ -1,0 +1,35 @@
+<div class="collections-container">
+  <!-- Page Header -->
+  <div class="collections-header">
+    <h1 class="collections-title">{{ t().collections.pageTitle }}</h1>
+    <p class="collections-subtitle">{{ t().collections.pageSubtitle }}</p>
+  </div>
+
+  <!-- Collections Grid -->
+  <div class="collections-grid">
+    <div *ngFor="let collection of collections" class="collection-card">
+      <!-- Collection Image & Info -->
+      <div class="collection-main" (click)="toggleCollection(collection.id)">
+        <div class="collection-image-wrapper">
+          <img [src]="collection.image" [alt]="getCollectionName(collection.id)" class="collection-image">
+          <div class="collection-overlay">
+            <h2 class="collection-name">{{ getCollectionName(collection.id) }}</h2>
+            <p class="collection-description">{{ getCollectionDescription(collection.id) }}</p>
+            <button class="view-collection-btn">
+              <span *ngIf="!collection.isExpanded">{{ t().collections.viewCollection }}</span>
+              <span *ngIf="collection.isExpanded">{{ t().collections.closeCollection }}</span>
+              <svg class="btn-icon" [class.rotated]="collection.isExpanded" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expanded Product Grid -->
+      <div class="collection-products" [class.expanded]="collection.isExpanded">
+        <app-product-grid></app-product-grid>
+      </div>
+    </div>
+  </div>
+</div>

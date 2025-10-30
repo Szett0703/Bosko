@@ -1,5 +1,19 @@
 /* Global Styles for Bosko */
 
+:root {
+  --bg-50: #F5F8FC;
+  --surface-100: #EAF0F7;
+  --border-300: #A9B7CC;
+  --text-900: #0B1D39;
+
+  --brand-900: #0B1D39; /* fondo fuerte */
+  --brand-800: #0E274D; /* header/hover */
+  --brand-700: #10305E; /* botón primario */
+  --accent-600: #3346A0; /* link/CTA secundario */
+
+  --focus-ring: #2B78CE; /* visible sin ser chillón */
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -14,10 +28,48 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #1f2937;
-  background-color: #ffffff;
+  color: var(--text-900);
+  background-color: var(--bg-50);
 }
 
 html, body {
   height: 100%;
+}
+
+a {
+  color: var(--accent-600);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Ajuste del header y layout cuando el sidebar se expande */
+body.sidebar-expanded .header {
+  left: 15rem;
+}
+
+body.sidebar-expanded .main-layout {
+  margin-left: 15rem;
+}
+
+@media (max-width: 1023px) {
+  body.sidebar-expanded .header {
+    left: 0;
+  }
+
+  body.sidebar-expanded .main-layout {
+    margin-left: 0;
+  }
 }
