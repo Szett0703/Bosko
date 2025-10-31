@@ -1,0 +1,22 @@
+<section class="products-section">
+  <div class="products-container">
+    <!-- Section Header -->
+    <div class="section-header">
+      <h2 class="section-title">Featured Products</h2>
+      <p class="section-subtitle">Discover our latest collection of premium clothing</p>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-grid">
+      <app-product-card
+        *ngFor="let product of products"
+        [product]="product">
+      </app-product-card>
+    </div>
+
+    <!-- View More Button -->
+    <div class="view-more">
+      <button class="view-more-btn">View All Products</button>
+    </div>
+  </div>
+</section>

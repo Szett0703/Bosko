@@ -1,0 +1,24 @@
+<div class="product-card">
+  <!-- Product Image -->
+  <div class="product-image-container">
+    <img
+      [src]="product.image"
+      [alt]="product.name"
+      class="product-image">
+    <div class="product-badge">NEW</div>
+  </div>
+
+  <!-- Product Info -->
+  <div class="product-info">
+    <h3 class="product-name">{{ product.name }}</h3>
+
+    <p *ngIf="product.description" class="product-description">
+      {{ product.description }}
+    </p>
+
+    <div class="product-footer">
+      <span class="product-price">${{ product.price }}</span>
+      <button class="add-to-cart-btn" (click)="onAddToCart()">{{ t().product.addToCart }}</button>
+    </div>
+  </div>
+</div>

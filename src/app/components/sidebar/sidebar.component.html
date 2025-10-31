@@ -1,0 +1,77 @@
+<!-- Overlay (Mobile) -->
+<div
+  *ngIf="isOpen"
+  (click)="close()"
+  class="overlay"
+  aria-hidden="true">
+</div>
+
+<!-- Sidebar -->
+<aside
+  class="sidebar"
+  [class.sidebar-open]="isOpen"
+  [class.sidebar-collapsed]="isCollapsed"
+  [class.sidebar-pinned]="isPinned"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()">
+  <div class="sidebar-content">
+    <!-- Logo and Brand Section -->
+    <div class="sidebar-header">
+      <div class="brand-section">
+        <div class="brand-logo">
+          <span class="logo-text">B</span>
+        </div>
+        <h2 class="brand-name" *ngIf="!isCollapsed">BOSKO</h2>
+      </div>
+
+      <!-- Pin/Unpin Toggle Button (Desktop only) -->
+      <button
+        (click)="togglePin()"
+        class="collapse-btn"
+        [class.pinned]="isPinned"
+        aria-label="Pin sidebar">
+        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <!-- Pin icon when not pinned -->
+          <path
+            *ngIf="!isPinned"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+          <!-- Pinned icon -->
+          <path
+            *ngIf="isPinned"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+            fill="currentColor"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav">
+      <a
+        *ngFor="let category of categories"
+        href="#"
+        (click)="close()"
+        class="category-link"
+        [title]="getCategoryName(category.key)">
+        <svg class="category-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path [attr.d]="category.icon"/>
+        </svg>
+        <span class="category-name" *ngIf="!isCollapsed">{{ getCategoryName(category.key) }}</span>
+      </a>
+    </nav>
+
+    <!-- Promotional Banner (only when expanded) -->
+    <div class="promo-banner" *ngIf="!isCollapsed">
+      <div class="promo-gradient">
+        <h3 class="promo-title">{{ t().sidebar.promoBanner.title }}</h3>
+        <p class="promo-text">{{ t().sidebar.promoBanner.subtitle }}</p>
+        <button class="promo-btn">{{ t().hero.ctaPrimary }}</button>
+      </div>
+    </div>
+  </div>
+</aside>
