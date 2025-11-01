@@ -1,0 +1,74 @@
+<div class="about-container">
+  <!-- Hero Section -->
+  <section class="about-hero">
+    <h1 class="page-title">{{ t().about.pageTitle }}</h1>
+    <div class="hero-image">
+      <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&h=400&fit=crop" alt="Bosko Store">
+    </div>
+  </section>
+
+  <!-- Mission Section -->
+  <section class="content-section">
+    <div class="section-content">
+      <div class="section-icon">🎯</div>
+      <h2 class="section-title">{{ t().about.mission.title }}</h2>
+      <p class="section-text">{{ t().about.mission.content }}</p>
+    </div>
+  </section>
+
+  <!-- Story Section -->
+  <section class="content-section alternate">
+    <div class="section-content">
+      <div class="section-icon">📖</div>
+      <h2 class="section-title">{{ t().about.story.title }}</h2>
+      <p class="section-text">{{ t().about.story.content }}</p>
+    </div>
+  </section>
+
+  <!-- Values Section -->
+  <section class="values-section">
+    <h2 class="section-title centered">{{ t().about.values.title }}</h2>
+
+    <div class="values-grid">
+      <div class="value-card">
+        <div class="value-icon">⭐</div>
+        <h3 class="value-title">{{ t().about.values.quality }}</h3>
+        <p class="value-description">{{ t().about.values.qualityDesc }}</p>
+      </div>
+
+      <div class="value-card">
+        <div class="value-icon">🌱</div>
+        <h3 class="value-title">{{ t().about.values.sustainability }}</h3>
+        <p class="value-description">{{ t().about.values.sustainabilityDesc }}</p>
+      </div>
+
+      <div class="value-card">
+        <div class="value-icon">💡</div>
+        <h3 class="value-title">{{ t().about.values.innovation }}</h3>
+        <p class="value-description">{{ t().about.values.innovationDesc }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section class="team-section">
+    <h2 class="section-title centered">{{ currentLang() === 'es' ? 'Nuestro Equipo' : 'Our Team' }}</h2>
+    <div class="team-grid">
+      <div class="team-member">
+        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=300&h=300&fit=crop" alt="Team Member" class="member-photo">
+        <h3 class="member-name">Alex Thompson</h3>
+        <p class="member-role">{{ currentLang() === 'es' ? 'CEO & Fundador' : 'CEO & Founder' }}</p>
+      </div>
+      <div class="team-member">
+        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&h=300&fit=crop" alt="Team Member" class="member-photo">
+        <h3 class="member-name">Sofia Martinez</h3>
+        <p class="member-role">{{ currentLang() === 'es' ? 'Directora de Diseño' : 'Design Director' }}</p>
+      </div>
+      <div class="team-member">
+        <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=300&h=300&fit=crop" alt="Team Member" class="member-photo">
+        <h3 class="member-name">Marcus Chen</h3>
+        <p class="member-role">{{ currentLang() === 'es' ? 'Director de Operaciones' : 'Operations Director' }}</p>
+      </div>
+    </div>
+  </section>
+</div>

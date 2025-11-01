@@ -1,0 +1,245 @@
+.collections-container {
+  padding: 2rem 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   Page Header
+   ============================================ */
+.collections-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.collections-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--brand-900);
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.collections-subtitle {
+  font-size: 1.125rem;
+  color: #64748b;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   Collections Grid
+   ============================================ */
+.collections-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .collections-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .collections-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ============================================
+   Collection Card
+   ============================================ */
+.collection-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+}
+
+.collection-card:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transform: translateY(-4px);
+}
+
+/* ============================================
+   Collection Main Section
+   ============================================ */
+.collection-main {
+  cursor: pointer;
+  position: relative;
+}
+
+.collection-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+}
+
+.collection-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.collection-card:hover .collection-image {
+  transform: scale(1.08);
+}
+
+/* ============================================
+   Collection Overlay
+   ============================================ */
+.collection-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(
+    to top,
+    rgba(11, 29, 57, 0.95) 0%,
+    rgba(11, 29, 57, 0.75) 50%,
+    transparent 100%
+  );
+  padding: 2.5rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transform: translateY(0);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.collection-card:hover .collection-overlay {
+  background: linear-gradient(
+    to top,
+    rgba(11, 29, 57, 0.98) 0%,
+    rgba(11, 29, 57, 0.85) 60%,
+    rgba(11, 29, 57, 0.3) 100%
+  );
+}
+
+.collection-name {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.collection-description {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ============================================
+   View Collection Button
+   ============================================ */
+.view-collection-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  color: var(--brand-900);
+  border: none;
+  border-radius: 9999px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  align-self: flex-start;
+  margin-top: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+}
+
+.view-collection-btn:hover {
+  background: var(--brand-700);
+  color: white;
+  transform: translateX(4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+}
+
+.view-collection-btn:active {
+  transform: translateX(4px) scale(0.98);
+}
+
+.btn-icon {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-icon.rotated {
+  transform: rotate(180deg);
+}
+
+/* ============================================
+   Expanded Product Grid
+   ============================================ */
+.collection-products {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #f8fafc;
+}
+
+.collection-products.expanded {
+  max-height: 3000px;
+  opacity: 1;
+  padding: 2rem 1rem;
+}
+
+/* ============================================
+   Responsive Adjustments
+   ============================================ */
+@media (max-width: 767px) {
+  .collections-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .collections-header {
+    margin-bottom: 2rem;
+  }
+
+  .collections-title {
+    font-size: 2rem;
+  }
+
+  .collections-subtitle {
+    font-size: 1rem;
+  }
+
+  .collections-grid {
+    gap: 1.5rem;
+  }
+
+  .collection-image-wrapper {
+    height: 300px;
+  }
+
+  .collection-name {
+    font-size: 1.5rem;
+  }
+
+  .collection-description {
+    font-size: 0.9rem;
+  }
+
+  .view-collection-btn {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* When collection card is expanded, span full width */
+@media (min-width: 768px) {
+  .collection-card:has(.collection-products.expanded) {
+    grid-column: 1 / -1;
+  }
+}

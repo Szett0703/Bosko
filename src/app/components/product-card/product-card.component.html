@@ -18,7 +18,7 @@
 
     <div class="product-footer">
       <span class="product-price">${{ product.price }}</span>
-      <button class="add-to-cart-btn">Add to Cart</button>
+      <button class="add-to-cart-btn" (click)="onAddToCart()">{{ t().product.addToCart }}</button>
     </div>
   </div>
 </div>

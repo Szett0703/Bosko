@@ -1,5 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LanguageService } from '../../services/language.service';
+import { CartService } from '../../services/cart.service';
 
 export interface Product {
   id: number;
@@ -17,4 +19,15 @@ export interface Product {
 })
 export class ProductCardComponent {
   @Input() product!: Product;
+
+  t = computed(() => this.languageService.getTranslations());
+
+  constructor(
+    private languageService: LanguageService,
+    private cartService: CartService
+  ) {}
+
+  onAddToCart() {
+    this.cartService.addToCart(this.product);
+  }
 }

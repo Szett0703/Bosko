@@ -5,7 +5,7 @@
       <div class="footer-section">
         <h3 class="footer-brand">BOSKO</h3>
         <p class="footer-description">
-          Premium quality clothing for the modern individual. Style meets comfort in every piece.
+          {{ t().footer.brandTagline }}
         </p>
         <p class="footer-copyright">
           © 2025 Bosko. All rights reserved.
@@ -14,28 +14,28 @@
 
       <!-- Quick Links -->
       <div class="footer-section">
-        <h4 class="footer-heading">Quick Links</h4>
+        <h4 class="footer-heading">{{ t().footer.quickLinks.title }}</h4>
         <ul class="footer-links">
-          <li><a href="#" class="footer-link">About Us</a></li>
-          <li><a href="#" class="footer-link">Collections</a></li>
-          <li><a href="#" class="footer-link">Size Guide</a></li>
-          <li><a href="#" class="footer-link">Shipping Info</a></li>
-          <li><a href="#" class="footer-link">Returns & Exchanges</a></li>
+          <li><a href="#" class="footer-link">{{ t().footer.quickLinks.about }}</a></li>
+          <li><a href="#" class="footer-link">{{ t().headerNav.collections }}</a></li>
+          <li><a href="#" class="footer-link">{{ t().footer.quickLinks.shipping }}</a></li>
+          <li><a href="#" class="footer-link">{{ t().footer.quickLinks.returns }}</a></li>
+          <li><a href="#" class="footer-link">{{ t().footer.quickLinks.faq }}</a></li>
         </ul>
       </div>
 
       <!-- Contact & Social -->
       <div class="footer-section">
-        <h4 class="footer-heading">Contact Us</h4>
+        <h4 class="footer-heading">{{ t().footer.contact.title }}</h4>
         <ul class="footer-contact">
-          <li class="contact-item">Email: info&#64;bosko.com</li>
-          <li class="contact-item">Phone: +1 (555) 123-4567</li>
-          <li class="contact-item">Address: 123 Fashion Ave, NY 10001</li>
+          <li class="contact-item">{{ t().footer.contact.email }}</li>
+          <li class="contact-item">{{ t().footer.contact.phone }}</li>
+          <li class="contact-item">{{ t().footer.contact.hours }}</li>
         </ul>
 
         <!-- Social Media Icons -->
         <div class="social-section">
-          <h5 class="social-heading">Follow Us</h5>
+          <h5 class="social-heading">{{ t().footer.followUs }}</h5>
           <div class="social-icons">
             <a href="#" class="social-icon" aria-label="Facebook">
               <svg class="icon" fill="currentColor" viewBox="0 0 24 24">

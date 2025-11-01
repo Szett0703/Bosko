@@ -1,0 +1,92 @@
+<div class="profile-container">
+  <h1 class="page-title">{{ t().profile.pageTitle }}</h1>
+
+  <div class="profile-content">
+    <!-- Personal Information -->
+    <section class="profile-section">
+      <h2 class="section-title">{{ t().profile.personalInfo.title }}</h2>
+
+      <form [formGroup]="profileForm" (ngSubmit)="onSaveProfile()" class="profile-form">
+        <div *ngIf="saveSuccess()" class="success-message">
+          ✓ {{ currentLang() === 'es' ? 'Cambios guardados exitosamente' : 'Changes saved successfully' }}
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">{{ t().profile.personalInfo.name }}</label>
+            <input type="text" formControlName="name" class="form-input">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">{{ t().profile.personalInfo.email }}</label>
+            <input type="email" formControlName="email" class="form-input">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">{{ t().profile.personalInfo.phone }}</label>
+            <input type="tel" formControlName="phone" class="form-input">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-save" [disabled]="profileForm.invalid">
+          {{ t().profile.personalInfo.save }}
+        </button>
+      </form>
+    </section>
+
+    <!-- Order History -->
+    <section class="profile-section">
+      <h2 class="section-title">{{ t().profile.orderHistory.title }}</h2>
+
+      <div class="empty-state">
+        <svg width="80" height="80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+        </svg>
+        <p class="empty-message">{{ t().profile.orderHistory.noOrders }}</p>
+      </div>
+    </section>
+
+    <!-- Preferences -->
+    <section class="profile-section">
+      <h2 class="section-title">{{ t().profile.preferences.title }}</h2>
+
+      <div class="preferences-list">
+        <div class="preference-item">
+          <div class="preference-info">
+            <h3 class="preference-label">{{ t().profile.preferences.language }}</h3>
+            <p class="preference-desc">{{ currentLang() === 'es' ? 'Español' : 'English' }}</p>
+          </div>
+          <button class="btn-change" (click)="toggleLanguage()">
+            {{ currentLang() === 'es' ? 'Cambiar' : 'Change' }}
+          </button>
+        </div>
+
+        <div class="preference-item">
+          <div class="preference-info">
+            <h3 class="preference-label">{{ t().profile.preferences.notifications }}</h3>
+            <p class="preference-desc">{{ currentLang() === 'es' ? 'Recibir notificaciones por correo' : 'Receive email notifications' }}</p>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" formControlName="notifications">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="preference-item">
+          <div class="preference-info">
+            <h3 class="preference-label">{{ t().profile.preferences.newsletter }}</h3>
+            <p class="preference-desc">{{ currentLang() === 'es' ? 'Recibir ofertas y novedades' : 'Receive offers and news' }}</p>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" formControlName="newsletter">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
