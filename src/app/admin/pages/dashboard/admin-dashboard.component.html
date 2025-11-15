@@ -1,0 +1,37 @@
+<div class="dashboard">
+  <section class="stats-grid">
+    <article class="stat-card" *ngFor="let stat of stats">
+      <h3>{{ stat.label }}</h3>
+      <p class="value">{{ stat.value }}</p>
+      <p class="trend" [class.positive]="stat.trend >= 0">
+        {{ stat.trend >= 0 ? '+' : '' }}{{ stat.trend }}%
+      </p>
+    </article>
+  </section>
+
+  <section class="charts-grid">
+    <div class="chart-card placeholder">
+      <h4>Ventas por Mes</h4>
+      <p>Integrar gráfico (Chart.js / ngx-charts)</p>
+    </div>
+    <div class="chart-card placeholder">
+      <h4>Pedidos por Estado</h4>
+      <p>Integrar gráfico de donas</p>
+    </div>
+  </section>
+
+  <section class="quick-actions">
+    <a routerLink="/admin/orders" class="quick-card">
+      <h4>Revisar pedidos</h4>
+      <p>Gestiona pedidos pendientes y actualiza estados.</p>
+    </a>
+    <a routerLink="/admin/products" class="quick-card">
+      <h4>Gestionar productos</h4>
+      <p>Crea, edita y organiza el catálogo.</p>
+    </a>
+    <a routerLink="/admin/users" class="quick-card">
+      <h4>Usuarios</h4>
+      <p>Administra roles y accesos.</p>
+    </a>
+  </section>
+</div>

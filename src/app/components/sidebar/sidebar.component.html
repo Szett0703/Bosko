@@ -53,19 +53,27 @@
     <!-- Navigation -->
     <nav class="sidebar-nav">
       <a
-        *ngFor="let category of categories"
-        href="#"
+        href="/"
         (click)="close()"
         class="category-link"
-        [title]="getCategoryName(category.key)">
+        title="Home">
         <svg class="category-icon" viewBox="0 0 24 24" fill="currentColor">
-          <path [attr.d]="category.icon"/>
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
         </svg>
-        <span class="category-name" *ngIf="!isCollapsed">{{ getCategoryName(category.key) }}</span>
+        <span class="category-name" *ngIf="!isCollapsed">Home</span>
       </a>
-    </nav>
 
-    <!-- Promotional Banner (only when expanded) -->
+      <a
+        href="/collections"
+        (click)="close()"
+        class="category-link"
+        title="Collections">
+        <svg class="category-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M4 4h16v2H4zm0 5h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+        </svg>
+        <span class="category-name" *ngIf="!isCollapsed">Collections</span>
+      </a>
+    </nav>    <!-- Promotional Banner (only when expanded) -->
     <div class="promo-banner" *ngIf="!isCollapsed">
       <div class="promo-gradient">
         <h3 class="promo-title">{{ t().sidebar.promoBanner.title }}</h3>

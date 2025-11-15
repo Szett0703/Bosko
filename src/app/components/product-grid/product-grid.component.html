@@ -6,16 +6,32 @@
       <p class="section-subtitle">Discover our latest collection of premium clothing</p>
     </div>
 
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <p class="ml-4 text-gray-600">Cargando productos...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="errorMessage && !isLoading" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-center my-8">
+      {{ errorMessage }}
+    </div>
+
     <!-- Products Grid -->
-    <div class="products-grid">
+    <div class="products-grid" *ngIf="!isLoading && products.length > 0">
       <app-product-card
         *ngFor="let product of products"
         [product]="product">
       </app-product-card>
     </div>
 
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && products.length === 0 && !errorMessage" class="text-center py-12">
+      <p class="text-gray-600">No hay productos disponibles en este momento.</p>
+    </div>
+
     <!-- View More Button -->
-    <div class="view-more">
+    <div class="view-more" *ngIf="!isLoading && products.length > 0">
       <button class="view-more-btn">View All Products</button>
     </div>
   </div>
