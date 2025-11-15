@@ -1,0 +1,40 @@
+<section class="management-wrapper">
+  <header class="section-header">
+    <div>
+      <h2>Gestión de Pedidos</h2>
+      <p>Monitorea el estado de los pedidos y actualiza las entregas.</p>
+    </div>
+    <div class="filters">
+      <label>
+        Estado:
+        <select>
+          <option>Pendiente</option>
+          <option>Procesando</option>
+          <option>Enviado</option>
+          <option>Completado</option>
+          <option>Cancelado</option>
+        </select>
+      </label>
+    </div>
+  </header>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Cliente</th>
+          <th>Fecha</th>
+          <th>Total</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="6" class="placeholder">Integrar datos desde API (GET /admin/orders)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

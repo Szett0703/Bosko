@@ -17,6 +17,11 @@
         <a (click)="navigateTo('/collections')" class="nav-link">{{ t().headerNav.collections }}</a>
         <a (click)="navigateTo('/about')" class="nav-link">{{ t().headerNav.about }}</a>
         <a (click)="navigateTo('/contact')" class="nav-link">{{ t().headerNav.contact }}</a>
+        @if (hasAdminAccess()) {
+          <a (click)="navigateTo('/admin')" class="nav-link admin-link">
+            {{ currentLang() === 'es' ? 'Panel Admin' : 'Admin Panel' }}
+          </a>
+        }
       </nav>
 
       <!-- User Actions -->
@@ -31,12 +36,33 @@
           <span class="lang-code">{{ currentLang() === 'es' ? 'EN' : 'ES' }}</span>
         </button>
 
-        <!-- User Profile Icon (Desktop) -->
-        <button class="action-btn" aria-label="User Profile" (click)="navigateTo('/profile')">
-          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-          </svg>
-        </button>
+        <!-- Auth Links (Desktop) -->
+        @if (isLoggedIn()) {
+          <a routerLink="/profile" class="action-btn" aria-label="User Profile">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+          </a>
+          @if (hasAdminAccess()) {
+            <a routerLink="/admin" class="action-btn hidden lg:block" title="Admin Panel">
+              <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+              </svg>
+            </a>
+          }
+          <button (click)="onLogout()" class="action-btn text-sm hidden lg:block" title="Cerrar Sesión">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+          </button>
+        } @else {
+          <a routerLink="/login" class="action-btn text-sm hidden lg:block px-3 py-1" title="Iniciar Sesión">
+            {{ currentLang() === 'es' ? 'Ingresar' : 'Login' }}
+          </a>
+          <a routerLink="/register" class="action-btn text-sm hidden lg:block px-3 py-1 bg-blue-600 text-white rounded-full hover:bg-blue-700" title="Registrarse">
+            {{ currentLang() === 'es' ? 'Registrarse' : 'Sign Up' }}
+          </a>
+        }
 
         <!-- Cart Icon (Desktop) -->
         <button class="action-btn" aria-label="Shopping Cart" (click)="navigateTo('/cart')">
@@ -65,8 +91,21 @@
       <a (click)="navigateTo('/collections')" class="mobile-nav-link">{{ t().headerNav.collections }}</a>
       <a (click)="navigateTo('/about')" class="mobile-nav-link">{{ t().headerNav.about }}</a>
       <a (click)="navigateTo('/contact')" class="mobile-nav-link">{{ t().headerNav.contact }}</a>
+      @if (hasAdminAccess()) {
+        <a (click)="navigateTo('/admin')" class="mobile-nav-link">
+          {{ currentLang() === 'es' ? 'Panel Admin' : 'Admin Panel' }}
+        </a>
+      }
       <div class="mobile-divider"></div>
-      <a (click)="navigateTo('/profile')" class="mobile-nav-link">{{ currentLang() === 'es' ? 'Mi Perfil' : 'My Profile' }}</a>
+
+      @if (isLoggedIn()) {
+        <a (click)="navigateTo('/profile')" class="mobile-nav-link">{{ currentLang() === 'es' ? 'Mi Perfil' : 'My Profile' }}</a>
+        <a (click)="onLogout()" class="mobile-nav-link">{{ currentLang() === 'es' ? 'Cerrar Sesión' : 'Logout' }}</a>
+      } @else {
+        <a (click)="navigateTo('/login')" class="mobile-nav-link">{{ currentLang() === 'es' ? 'Iniciar Sesión' : 'Login' }}</a>
+        <a (click)="navigateTo('/register')" class="mobile-nav-link">{{ currentLang() === 'es' ? 'Registrarse' : 'Sign Up' }}</a>
+      }
+
       <a (click)="navigateTo('/cart')" class="mobile-nav-link">{{ currentLang() === 'es' ? 'Carrito' : 'Shopping Cart' }}</a>
       <button (click)="toggleLanguage()" class="mobile-nav-link language-switch">
         <span class="flag-icon">{{ currentLang() === 'es' ? '🇺🇸' : '🇪🇸' }}</span>

@@ -1,10 +1,17 @@
 <div class="product-card">
   <!-- Product Image -->
   <div class="product-image-container">
+    <!-- Skeleton loader mientras carga la imagen -->
+    <div *ngIf="!imageLoaded && !imageError" class="image-skeleton"></div>
+
     <img
-      [src]="product.image"
+      [src]="getProductImageUrl()"
       [alt]="product.name"
+      [class.hidden]="!imageLoaded && !imageError"
+      (load)="onImageLoad()"
+      (error)="onImageError($event)"
       class="product-image">
+
     <div class="product-badge">NEW</div>
   </div>
 

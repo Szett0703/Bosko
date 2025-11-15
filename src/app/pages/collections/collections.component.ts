@@ -1,13 +1,13 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductGridComponent } from '../../components/product-grid/product-grid.component';
 import { LanguageService } from '../../services/language.service';
+import { CategoryService } from '../../services/category.service';
+import { Category } from '../../models/category.model';
+import { getImageUrl } from '../../config/api.config';
+import { Subscription } from 'rxjs';
 
-interface Collection {
-  id: number;
-  name: string;
-  description: string;
-  image: string;
+interface CollectionWithExpansion extends Category {
   isExpanded: boolean;
 }
 
@@ -17,80 +17,46 @@ interface Collection {
   templateUrl: './collections.component.html',
   styleUrl: './collections.component.css'
 })
-export class CollectionsComponent {
+export class CollectionsComponent implements OnInit, OnDestroy {
   t = computed(() => this.languageService.getTranslations());
+  collections: CollectionWithExpansion[] = [];
+  isLoading: boolean = true;
+  errorMessage: string = '';
+  private subscriptions = new Subscription();
 
-  constructor(private languageService: LanguageService) {}
+  constructor(
+    private languageService: LanguageService,
+    private categoryService: CategoryService
+  ) {}
 
-  collections: Collection[] = [
-    {
-      id: 1,
-      name: '',
-      description: '',
-      image: 'https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=800&h=600&fit=crop',
-      isExpanded: false
-    },
-    {
-      id: 2,
-      name: '',
-      description: '',
-      image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=600&fit=crop',
-      isExpanded: false
-    },
-    {
-      id: 3,
-      name: '',
-      description: '',
-      image: 'https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?w=800&h=600&fit=crop',
-      isExpanded: false
-    },
-    {
-      id: 4,
-      name: '',
-      description: '',
-      image: 'https://images.unsplash.com/photo-1523359346063-d879354c0ea5?w=800&h=600&fit=crop',
-      isExpanded: false
-    },
-    {
-      id: 5,
-      name: '',
-      description: '',
-      image: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=800&h=600&fit=crop',
-      isExpanded: false
-    },
-    {
-      id: 6,
-      name: '',
-      description: '',
-      image: 'https://images.unsplash.com/photo-1607083206968-13611e3d76db?w=800&h=600&fit=crop',
-      isExpanded: false
-    }
-  ];
-
-  getCollectionName(id: number): string {
-    const trans = this.t().collections;
-    switch(id) {
-      case 1: return trans.menCollection.name;
-      case 2: return trans.womenCollection.name;
-      case 3: return trans.kidsCollection.name;
-      case 4: return trans.accessoriesCollection.name;
-      case 5: return trans.footwearCollection.name;
-      case 6: return trans.saleCollection.name;
-      default: return '';
-    }
+  ngOnInit(): void {
+    this.loadCollections();
   }
 
-  getCollectionDescription(id: number): string {
-    const trans = this.t().collections;
-    switch(id) {
-      case 1: return trans.menCollection.description;
-      case 2: return trans.womenCollection.description;
-      case 3: return trans.kidsCollection.description;
-      case 4: return trans.accessoriesCollection.description;
-      case 5: return trans.footwearCollection.description;
-      case 6: return trans.saleCollection.description;
-      default: return '';
-    }
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
+  loadCollections(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    const categorySub = this.categoryService.getCategories().subscribe({
+      next: (categories) => {
+        this.collections = categories.map(cat => ({
+          ...cat,
+          isExpanded: false
+        }));
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.errorMessage = 'Error al cargar colecciones. Por favor verifica que el backend esté corriendo.';
+        this.isLoading = false;
+        console.error('Error loading collections:', err);
+      }
+    });
+
+    this.subscriptions.add(categorySub);
   }
 
   toggleCollection(collectionId: number): void {
@@ -98,5 +64,20 @@ export class CollectionsComponent {
     if (collection) {
       collection.isExpanded = !collection.isExpanded;
     }
+  }
+
+  /**
+   * Obtiene la URL completa de la imagen
+   */
+  getImageUrl(imagePath: string | undefined): string {
+    return getImageUrl(imagePath);
+  }
+
+  /**
+   * Maneja el error al cargar la imagen
+   */
+  onImageError(event: Event): void {
+    const imgElement = event.target as HTMLImageElement;
+    imgElement.src = 'https://via.placeholder.com/800x400/3B82F6/FFFFFF?text=Collection';
   }
 }

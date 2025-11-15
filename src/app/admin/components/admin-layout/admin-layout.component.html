@@ -1,0 +1,46 @@
+<div class="admin-layout" [class.collapsed]="isSidebarCollapsed">
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <h2>Bosko Admin</h2>
+      <button (click)="toggleSidebar()" class="collapse-btn" type="button">
+        <span *ngIf="!isSidebarCollapsed">⫷</span>
+        <span *ngIf="isSidebarCollapsed">⫸</span>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <span>Dashboard</span>
+      </a>
+      <a routerLink="/admin/orders" routerLinkActive="active">
+        <span>Pedidos</span>
+      </a>
+      <a routerLink="/admin/products" routerLinkActive="active">
+        <span>Productos</span>
+      </a>
+      <a routerLink="/admin/categories" routerLinkActive="active">
+        <span>Categorías</span>
+      </a>
+      <a routerLink="/admin/users" routerLinkActive="active">
+        <span>Usuarios</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer" *ngIf="currentUser() as user">
+      <p class="user-name">{{ user.name }}</p>
+      <p class="user-role">{{ user.role }}</p>
+      <button (click)="logout()" class="logout-btn" type="button">
+        {{ currentLang() === 'es' ? 'Cerrar sesión' : 'Logout' }}
+      </button>
+    </div>
+  </aside>
+
+  <main class="admin-content">
+    <header class="admin-header">
+      <h1>Panel de Administración</h1>
+    </header>
+    <section class="admin-page">
+      <router-outlet></router-outlet>
+    </section>
+  </main>
+</div>
