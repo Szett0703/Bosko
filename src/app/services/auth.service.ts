@@ -22,20 +22,38 @@ export class AuthService {
   private loggedInSignal = signal<boolean>(false);
   public isLoggedIn = computed(() => this.loggedInSignal());
 
+  private userRoleSignal = signal<UserRole | null>(null);
+  public userRole = computed(() => this.userRoleSignal());
+
   constructor(
     private http: HttpClient,
     private router: Router
   ) {
     // Check if user is logged in on service initialization
+    this.initializeAuthState();
+  }
+
+  private initializeAuthState(): void {
     const token = this.getToken();
-    if (token) {
-      this.loggedInSignal.set(true);
-      // Optionally decode token to get user info
+    if (token && this.isTokenValid(token)) {
       const user = this.getUserFromToken(token);
       if (user) {
+        this.loggedInSignal.set(true);
         this.currentUserSubject.next(user);
+        this.userRoleSignal.set(user.role);
+      } else {
+        this.clearAuthState();
       }
+    } else {
+      this.clearAuthState();
     }
+  }
+
+  private clearAuthState(): void {
+    localStorage.removeItem('bosko-token');
+    this.loggedInSignal.set(false);
+    this.currentUserSubject.next(null);
+    this.userRoleSignal.set(null);
   }
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
@@ -47,6 +65,7 @@ export class AuthService {
         this.setToken(response.token);
         this.currentUserSubject.next(response.user);
         this.loggedInSignal.set(true);
+        this.userRoleSignal.set(response.user.role);
       })
     );
   }
@@ -60,6 +79,7 @@ export class AuthService {
         this.setToken(response.token);
         this.currentUserSubject.next(response.user);
         this.loggedInSignal.set(true);
+        this.userRoleSignal.set(response.user.role);
       })
     );
   }
@@ -74,6 +94,7 @@ export class AuthService {
         this.setToken(response.token);
         this.currentUserSubject.next(response.user);
         this.loggedInSignal.set(true);
+        this.userRoleSignal.set(response.user.role);
       })
     );
   }
@@ -93,9 +114,7 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('bosko-token');
-    this.currentUserSubject.next(null);
-    this.loggedInSignal.set(false);
+    this.clearAuthState();
     this.router.navigate(['/']);
   }
 
@@ -109,9 +128,10 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     const token = this.getToken();
-    if (!token) return false;
+    return token ? this.isTokenValid(token) : false;
+  }
 
-    // Check if token is expired
+  private isTokenValid(token: string): boolean {
     try {
       const payload = this.decodeToken(token);
       const currentTime = Math.floor(Date.now() / 1000);
@@ -124,26 +144,40 @@ export class AuthService {
   private getUserFromToken(token: string): User | null {
     try {
       const payload = this.decodeToken(token);
+      // Handle different JWT claim formats
+      const userId = payload.sub || payload.userId || payload.nameid || payload.id;
+      const userName = payload.name || payload.unique_name || payload.given_name || 'User';
+      const userEmail = payload.email || payload.preferred_username || '';
+      const userRole = payload.role || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || 'Customer';
+
       return {
-        id: payload.sub || payload.userId,
-        name: payload.name || payload.unique_name,
-        email: payload.email,
-        role: payload.role || 'Customer',
+        id: parseInt(userId) || 0,
+        name: userName,
+        email: userEmail,
+        role: userRole as UserRole,
         provider: payload.provider || 'Local'
       };
-    } catch {
+    } catch (error) {
+      console.error('Error decoding token:', error);
       return null;
     }
   }
 
   private decodeToken(token: string): any {
-    const parts = token.split('.');
-    if (parts.length !== 3) {
-      throw new Error('Invalid token format');
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        throw new Error('Invalid token format');
+      }
+      const payload = parts[1];
+      // Handle URL-safe base64
+      const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const decoded = atob(base64);
+      return JSON.parse(decoded);
+    } catch (error) {
+      console.error('Token decode error:', error);
+      throw new Error('Failed to decode token');
     }
-    const payload = parts[1];
-    const decoded = atob(payload);
-    return JSON.parse(decoded);
   }
 
   getCurrentUser(): User | null {

@@ -8,41 +8,74 @@ import { UserManagementComponent } from './pages/users/user-management.component
 import { authGuard } from '../guards/auth.guard';
 import { roleGuard } from '../guards/role.guard';
 
+/**
+ * Admin Panel Routes Configuration
+ *
+ * Access Levels:
+ * - Dashboard: Admin & Employee (view statistics)
+ * - Orders: Admin & Employee (manage orders)
+ * - Products: Admin only (full CRUD)
+ * - Categories: Admin only (full CRUD)
+ * - Users: Admin only (full CRUD)
+ */
 export const adminRoutes: Routes = [
   {
     path: 'admin',
     component: AdminLayoutComponent,
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['Admin', 'Employee'] },
+    data: {
+      roles: ['Admin', 'Employee'],
+      title: 'Panel de Administración'
+    },
     children: [
       {
         path: '',
         component: AdminDashboardComponent,
-        title: 'Admin Dashboard'
+        data: {
+          roles: ['Admin', 'Employee'],
+          title: 'Dashboard'
+        }
       },
       {
-        path: 'products',
-        component: ProductManagementComponent,
-        canActivate: [roleGuard],
-        data: { roles: ['Admin'] }
-      },
-      {
-        path: 'categories',
-        component: CategoryManagementComponent,
-        canActivate: [roleGuard],
-        data: { roles: ['Admin'] }
+        path: 'dashboard',
+        redirectTo: '',
+        pathMatch: 'full'
       },
       {
         path: 'orders',
         component: OrderManagementComponent,
         canActivate: [roleGuard],
-        data: { roles: ['Admin', 'Employee'] }
+        data: {
+          roles: ['Admin', 'Employee'],
+          title: 'Gestión de Pedidos'
+        }
+      },
+      {
+        path: 'products',
+        component: ProductManagementComponent,
+        canActivate: [roleGuard],
+        data: {
+          roles: ['Admin'],
+          title: 'Gestión de Productos'
+        }
+      },
+      {
+        path: 'categories',
+        component: CategoryManagementComponent,
+        canActivate: [roleGuard],
+        data: {
+          roles: ['Admin'],
+          title: 'Gestión de Categorías'
+        }
       },
       {
         path: 'users',
         component: UserManagementComponent,
         canActivate: [roleGuard],
-        data: { roles: ['Admin'] }
+        data: {
+          roles: ['Admin'],
+          title: 'Gestión de Usuarios'
+        }
       }
     ]
   }

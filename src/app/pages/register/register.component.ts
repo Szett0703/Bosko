@@ -16,6 +16,8 @@ export class RegisterComponent implements OnDestroy {
   registerForm: FormGroup;
   registerError: string = '';
   isLoading: boolean = false;
+  showPassword: boolean = false;
+  showConfirmPassword: boolean = false;
   private subscriptions = new Subscription();
 
   constructor(
@@ -111,5 +113,13 @@ export class RegisterComponent implements OnDestroy {
       return 'Las contraseñas no coinciden';
     }
     return '';
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 }

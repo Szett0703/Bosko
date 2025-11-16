@@ -1,46 +1,174 @@
-<div class="admin-layout" [class.collapsed]="isSidebarCollapsed">
-  <aside class="admin-sidebar">
+<!-- Modern Admin Panel Layout -->
+<div class="admin-layout" [class.sidebar-collapsed]="isSidebarCollapsed">
+  <!-- Sidebar Navigation -->
+  <aside class="admin-sidebar" [class.collapsed]="isSidebarCollapsed">
+    <!-- Logo & Brand -->
     <div class="sidebar-header">
-      <h2>Bosko Admin</h2>
-      <button (click)="toggleSidebar()" class="collapse-btn" type="button">
-        <span *ngIf="!isSidebarCollapsed">⫷</span>
-        <span *ngIf="isSidebarCollapsed">⫸</span>
+      <div class="brand">
+        <svg class="brand-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+        </svg>
+        <span class="brand-text" *ngIf="!isSidebarCollapsed">BOSKO</span>
+      </div>
+      <button class="collapse-btn" (click)="toggleSidebar()" type="button" [title]="isSidebarCollapsed ? 'Expandir' : 'Contraer'">
+        <svg *ngIf="!isSidebarCollapsed" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+        </svg>
+        <svg *ngIf="isSidebarCollapsed" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+        </svg>
       </button>
     </div>
 
+    <!-- User Info -->
+    <div class="user-section" *ngIf="currentUser() as user">
+      <div class="user-avatar">
+        <span>{{ getUserInitials(user.name) }}</span>
+      </div>
+      <div class="user-info" *ngIf="!isSidebarCollapsed">
+        <p class="user-name">{{ user.name }}</p>
+        <span class="user-badge" [class.admin]="user.role === 'Admin'" [class.employee]="user.role === 'Employee'">
+          {{ user.role }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Navigation Menu -->
     <nav class="sidebar-nav">
-      <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-        <span>Dashboard</span>
-      </a>
-      <a routerLink="/admin/orders" routerLinkActive="active">
-        <span>Pedidos</span>
-      </a>
-      <a routerLink="/admin/products" routerLinkActive="active">
-        <span>Productos</span>
-      </a>
-      <a routerLink="/admin/categories" routerLinkActive="active">
-        <span>Categorías</span>
-      </a>
-      <a routerLink="/admin/users" routerLinkActive="active">
-        <span>Usuarios</span>
-      </a>
+      <div class="nav-section">
+        <p class="nav-section-title" *ngIf="!isSidebarCollapsed">PRINCIPAL</p>
+
+        <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z"></path>
+          </svg>
+          <span class="nav-text" *ngIf="!isSidebarCollapsed">Dashboard</span>
+          <span class="nav-badge" *ngIf="!isSidebarCollapsed && pendingOrders > 0">{{ pendingOrders }}</span>
+        </a>
+
+        <a routerLink="/admin/orders" routerLinkActive="active" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+          </svg>
+          <span class="nav-text" *ngIf="!isSidebarCollapsed">Pedidos</span>
+          <span class="nav-badge" *ngIf="!isSidebarCollapsed && pendingOrders > 0">{{ pendingOrders }}</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <p class="nav-section-title" *ngIf="!isSidebarCollapsed">CATÁLOGO</p>
+
+        <a routerLink="/admin/products" routerLinkActive="active" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+          </svg>
+          <span class="nav-text" *ngIf="!isSidebarCollapsed">Productos</span>
+        </a>
+
+        <a routerLink="/admin/categories" routerLinkActive="active" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+          </svg>
+          <span class="nav-text" *ngIf="!isSidebarCollapsed">Categorías</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <p class="nav-section-title" *ngIf="!isSidebarCollapsed">GESTIÓN</p>
+
+        <a routerLink="/admin/users" routerLinkActive="active" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+          <span class="nav-text" *ngIf="!isSidebarCollapsed">Usuarios</span>
+        </a>
+      </div>
     </nav>
 
-    <div class="sidebar-footer" *ngIf="currentUser() as user">
-      <p class="user-name">{{ user.name }}</p>
-      <p class="user-role">{{ user.role }}</p>
-      <button (click)="logout()" class="logout-btn" type="button">
-        {{ currentLang() === 'es' ? 'Cerrar sesión' : 'Logout' }}
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()" type="button" [title]="isSidebarCollapsed ? 'Cerrar sesión' : ''">
+        <svg class="logout-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+        </svg>
+        <span *ngIf="!isSidebarCollapsed">Cerrar Sesión</span>
       </button>
+
+      <a routerLink="/" class="back-store-btn" [title]="isSidebarCollapsed ? 'Volver a la tienda' : ''">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+        </svg>
+        <span *ngIf="!isSidebarCollapsed">Ir a la Tienda</span>
+      </a>
     </div>
   </aside>
 
-  <main class="admin-content">
+  <!-- Main Content Area -->
+  <div class="admin-main">
+    <!-- Top Header -->
     <header class="admin-header">
-      <h1>Panel de Administración</h1>
+      <!-- Breadcrumbs -->
+      <div class="breadcrumbs">
+        <svg class="breadcrumb-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+        </svg>
+        <span class="breadcrumb">Panel de Administración</span>
+        <span class="breadcrumb-separator">/</span>
+        <span class="breadcrumb-current">{{ getCurrentPageTitle() }}</span>
+      </div>
+
+      <!-- Header Actions -->
+      <div class="header-actions">
+        <!-- Search Bar -->
+        <div class="search-bar">
+          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input type="text" placeholder="Buscar..." class="search-input" [(ngModel)]="searchQuery">
+        </div>
+
+        <!-- Notifications -->
+        <button class="icon-btn" type="button" [class.has-notifications]="notifications > 0">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+          </svg>
+          <span class="notification-badge" *ngIf="notifications > 0">{{ notifications }}</span>
+        </button>
+
+        <!-- Settings -->
+        <button class="icon-btn" type="button">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+        </button>
+
+        <!-- User Profile -->
+        <div class="header-user" *ngIf="currentUser() as user">
+          <div class="user-avatar-small">
+            <span>{{ getUserInitials(user.name) }}</span>
+          </div>
+          <div class="user-details">
+            <p class="user-name-header">{{ user.name }}</p>
+            <p class="user-role-header">{{ user.role }}</p>
+          </div>
+        </div>
+      </div>
     </header>
-    <section class="admin-page">
+
+    <!-- Page Content -->
+    <main class="admin-content">
       <router-outlet></router-outlet>
-    </section>
-  </main>
+    </main>
+
+    <!-- Footer -->
+    <footer class="admin-footer">
+      <p>&copy; 2025 Bosko. Todos los derechos reservados.</p>
+      <div class="footer-links">
+        <a href="#">Documentación</a>
+        <a href="#">Soporte</a>
+        <a href="#">API</a>
+      </div>
+    </footer>
+  </div>
 </div>
