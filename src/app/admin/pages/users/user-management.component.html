@@ -1,30 +1,75 @@
-<section class="management-wrapper">
-  <header class="section-header">
-    <div>
-      <h2>Gestión de Usuarios</h2>
-      <p>Administra roles, cuentas y accesos al sistema.</p>
-    </div>
-    <button class="btn-primary" type="button">Nuevo usuario</button>
-  </header>
+<div class="p-6">
+  <h1 class="text-3xl font-bold text-white mb-6">Gestión de Usuarios</h1>
 
-  <div class="table-wrapper">
-    <table>
-      <thead>
+  <!-- Filters -->
+  <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-4 mb-6 border border-gray-700 grid grid-cols-4 gap-3">
+    <input type="text" [(ngModel)]="searchTerm" (keyup.enter)="applyFilters()" placeholder="Buscar..." class="px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm" />
+    <select [(ngModel)]="roleFilter" (change)="applyFilters()" class="px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm">
+      <option [value]="undefined">Todos los roles</option>
+      <option value="Admin">Admin</option>
+      <option value="Employee">Employee</option>
+      <option value="Customer">Customer</option>
+    </select>
+    <select [(ngModel)]="statusFilter" (change)="applyFilters()" class="px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm">
+      <option [value]="undefined">Todos los estados</option>
+      <option [value]="true">Activos</option>
+      <option [value]="false">Inactivos</option>
+    </select>
+    <button (click)="clearFilters()" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded text-sm">Limpiar</button>
+  </div>
+
+  <div *ngIf="error" class="bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded mb-4">{{error}}</div>
+  <div *ngIf="loading" class="text-center py-12"><div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div></div>
+
+  <div *ngIf="!loading && users.length > 0" class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border border-gray-700 overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-900">
         <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Email</th>
-          <th>Rol</th>
-          <th>Proveedor</th>
-          <th>Creado</th>
-          <th>Acciones</th>
+          <th class="px-4 py-3 text-left text-xs text-gray-400 uppercase">Usuario</th>
+          <th class="px-4 py-3 text-left text-xs text-gray-400 uppercase">Rol</th>
+          <th class="px-4 py-3 text-left text-xs text-gray-400 uppercase">Estado</th>
+          <th class="px-4 py-3 text-right text-xs text-gray-400 uppercase">Acciones</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td colspan="7" class="placeholder">Integrar datos desde API (GET /admin/users)</td>
+      <tbody class="divide-y divide-gray-700">
+        <tr *ngFor="let user of users" class="hover:bg-gray-800">
+          <td class="px-4 py-3">
+            <p class="text-white font-medium">{{user.name}}</p>
+            <p class="text-gray-400 text-xs">{{user.email}}</p>
+          </td>
+          <td class="px-4 py-3"><span [class]="'px-2 py-1 rounded text-xs text-white ' + getRoleBadgeClass(user.role)">{{user.role}}</span></td>
+          <td class="px-4 py-3"><span [class]="'px-2 py-1 rounded text-xs text-white ' + getStatusBadgeClass(user.isActive)">{{user.isActive ? 'Activo' : 'Inactivo'}}</span></td>
+          <td class="px-4 py-3 text-right">
+            <button (click)="openRoleModal(user)" class="text-blue-400 hover:text-blue-300 mr-2" title="Rol">✏️</button>
+            <button (click)="toggleStatus(user)" class="text-yellow-400 hover:text-yellow-300 mr-2" title="Estado">🔒</button>
+            <button (click)="deleteUser(user)" class="text-red-400 hover:text-red-300" title="Eliminar">🗑️</button>
+          </td>
         </tr>
       </tbody>
     </table>
+    <div class="bg-gray-900 px-4 py-3 flex justify-between text-sm border-t border-gray-700">
+      <span class="text-gray-400">{{totalCount}} usuarios</span>
+      <div class="flex gap-2">
+        <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1" class="px-3 py-1 bg-gray-700 text-white rounded disabled:opacity-50">Ant</button>
+        <span class="px-3 py-1 text-white">{{currentPage}}/{{totalPages}}</span>
+        <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages" class="px-3 py-1 bg-gray-700 text-white rounded disabled:opacity-50">Sig</button>
+      </div>
+    </div>
   </div>
-</section>
+</div>
+
+<div *ngIf="showRoleModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+  <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border border-gray-700 p-6 max-w-md w-full mx-4">
+    <h2 class="text-xl font-bold text-white mb-4">Cambiar Rol</h2>
+    <p class="text-gray-300 mb-4">Usuario: <span class="text-white font-semibold">{{selectedUser?.name}}</span></p>
+    <select [(ngModel)]="newRole" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white mb-4">
+      <option value="Admin">Admin</option>
+      <option value="Employee">Employee</option>
+      <option value="Customer">Customer</option>
+    </select>
+    <div class="flex justify-end gap-3">
+      <button (click)="closeRoleModal()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded">Cancelar</button>
+      <button (click)="changeRole()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">Cambiar</button>
+    </div>
+  </div>
+</div>

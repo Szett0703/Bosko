@@ -155,7 +155,9 @@ export class AuthService {
         name: userName,
         email: userEmail,
         role: userRole as UserRole,
-        provider: payload.provider || 'Local'
+        provider: payload.provider || 'Local',
+        isActive: true,
+        createdAt: new Date()
       };
     } catch (error) {
       console.error('Error decoding token:', error);
