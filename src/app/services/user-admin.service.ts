@@ -14,7 +14,7 @@ import { User, UserUpdateDto, UserRoleChangeDto, UserFilters } from '../models/u
   providedIn: 'root'
 })
 export class UserAdminService {
-  private apiUrl = `${API_CONFIG.backendUrl}${API_CONFIG.endpoints.admin.users}`;
+  private apiUrl = `${API_CONFIG.backendUrl}/api/admin/users`;
 
   constructor(private http: HttpClient) {}
 

@@ -13,7 +13,7 @@ import { Category, CategoryCreateDto, SimpleCategoryDto } from '../models/catego
   providedIn: 'root'
 })
 export class CategoryAdminService {
-  private apiUrl = `${API_CONFIG.backendUrl}${API_CONFIG.endpoints.admin.categories}`;
+  private apiUrl = `${API_CONFIG.backendUrl}/api/admin/categories`;
 
   constructor(private http: HttpClient) {}
 

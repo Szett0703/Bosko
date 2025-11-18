@@ -14,7 +14,7 @@ import { Product, ProductCreateDto, ProductFilters } from '../models/product.mod
   providedIn: 'root'
 })
 export class ProductAdminService {
-  private apiUrl = `${API_CONFIG.backendUrl}${API_CONFIG.endpoints.admin.products}`;
+  private apiUrl = `${API_CONFIG.backendUrl}/api/admin/products`;
 
   constructor(private http: HttpClient) {}
 
