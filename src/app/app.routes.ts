@@ -5,6 +5,7 @@ import { AboutComponent } from './pages/about/about.component';
 import { ContactComponent } from './pages/contact/contact.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { CartComponent } from './pages/cart/cart.component';
+import { OrdersComponent } from './pages/orders/orders.component';
 import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
@@ -30,6 +31,7 @@ export const routes: Routes = [
 
   // Protected routes
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
+  { path: 'orders', component: OrdersComponent, canActivate: [authGuard] },
 
   // Error pages
   { path: 'forbidden', component: ForbiddenComponent },

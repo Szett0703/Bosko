@@ -1,5 +1,6 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { Product } from '../models/product.model';
+import { AuthService } from './auth.service';
 
 export interface CartItem extends Product {
   quantity: number;
@@ -9,7 +10,9 @@ export interface CartItem extends Product {
   providedIn: 'root'
 })
 export class CartService {
+  private authService = inject(AuthService);
   private cartItems = signal<CartItem[]>([]);
+  private currentUserId: number | null = null;
 
   // Computed signals
   items = computed(() => this.cartItems());
@@ -21,6 +24,26 @@ export class CartService {
   constructor() {
     // Load cart from localStorage on init
     this.loadCartFromStorage();
+
+    // Watch for user changes and reset cart when user logs out
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        // User logged in - check if it's a different user
+        if (this.currentUserId !== null && this.currentUserId !== user.id) {
+          console.log('🔄 Usuario diferente detectado, limpiando carrito...');
+          this.resetCart();
+        }
+        this.currentUserId = user.id;
+        this.loadCartFromStorage();
+      } else {
+        // User logged out - clear cart
+        if (this.currentUserId !== null) {
+          console.log('🔴 Usuario cerró sesión, limpiando carrito...');
+          this.resetCart();
+          this.currentUserId = null;
+        }
+      }
+    });
   }
 
   addToCart(product: Product) {
@@ -63,9 +86,23 @@ export class CartService {
     this.saveCartToStorage();
   }
 
+  /**
+   * Clear all items from cart
+   * Used when user completes checkout or logs out
+   */
   clearCart() {
     this.cartItems.set([]);
     this.saveCartToStorage();
+  }
+
+  /**
+   * Reset cart completely (clear memory and storage)
+   * Call this when user logs out to prevent cart data leakage
+   */
+  resetCart() {
+    this.cartItems.set([]);
+    localStorage.removeItem('bosko-cart');
+    console.log('🛒 Carrito reiniciado completamente');
   }
 
   private saveCartToStorage() {

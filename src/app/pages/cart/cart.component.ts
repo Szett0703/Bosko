@@ -96,16 +96,45 @@ export class CartComponent implements OnDestroy {
     this.checkoutError.set('');
     this.checkoutSuccess.set(false);
 
+    const user = this.authService.getCurrentUser();
+    if (!user) {
+      this.checkoutError.set('Debes iniciar sesión para realizar un pedido');
+      this.isCheckingOut.set(false);
+      return;
+    }
+
     // Prepare order data
     const orderData = {
+      customerId: user.id,
       items: this.cartItems().map(item => ({
         productId: item.id,
-        quantity: item.quantity
-      }))
+        productName: item.name,
+        productImage: item.image || '',
+        quantity: item.quantity,
+        unitPrice: item.price
+      })),
+      shippingAddress: {
+        fullName: user.name,
+        phone: '555-0000',
+        street: 'Dirección temporal',
+        city: 'Ciudad',
+        state: 'Estado',
+        postalCode: '00000',
+        country: 'México'
+      },
+      paymentMethod: 'credit_card' as const,
+      notes: 'Pedido desde carrito - actualizar dirección en Mis Pedidos'
     };
+
+    // Debug: Log order data being sent
+    console.log('=== CHECKOUT DEBUG ===');
+    console.log('Order Data:', JSON.stringify(orderData, null, 2));
+    console.log('URL:', `${this.orderService['baseUrl']}`);
+    console.log('User:', user);
 
     const checkoutSub = this.orderService.createOrder(orderData).subscribe({
       next: (response) => {
+        console.log('✅ Order created successfully:', response);
         this.isCheckingOut.set(false);
         this.checkoutSuccess.set(true);
 
@@ -118,13 +147,48 @@ export class CartComponent implements OnDestroy {
         }, 2000);
       },
       error: (err) => {
+        console.error('❌ CHECKOUT ERROR - Full Details:');
+        console.error('Status:', err.status);
+        console.error('Status Text:', err.statusText);
+        console.error('Error Body:', err.error);
+        console.error('Message:', err.message);
+        console.error('Full Error Object:', err);
+
         this.isCheckingOut.set(false);
-        this.checkoutError.set(
-          err.error?.message ||
-          (this.languageService.getCurrentLanguage() === 'es'
+
+        // Try to extract detailed error message from backend
+        let errorMessage = '';
+        if (err.error?.message) {
+          errorMessage = err.error.message;
+        } else if (err.error?.errors) {
+          // Validation errors from backend
+          const validationErrors = Object.entries(err.error.errors)
+            .map(([field, messages]: [string, any]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
+            .join('\n');
+          errorMessage = `Errores de validación:\n${validationErrors}`;
+        } else {
+          errorMessage = this.languageService.getCurrentLanguage() === 'es'
             ? 'Error al procesar el pedido. Por favor intenta de nuevo.'
-            : 'Error processing order. Please try again.')
-        );
+            : 'Error processing order. Please try again.';
+        }
+
+        this.checkoutError.set(errorMessage);
+
+        // Generate backend report
+        console.log('\n🔴 MENSAJE PARA EL BACKEND:');
+        console.log('==========================');
+        console.log('Endpoint: POST https://localhost:5006/api/orders');
+        console.log('Datos enviados:', JSON.stringify(orderData, null, 2));
+        console.log('\nRespuesta del servidor:');
+        console.log('- Status:', err.status);
+        console.log('- Error:', err.error);
+        console.log('\nChecklist para Backend:');
+        console.log('[ ] Verificar que el DTO OrderCreateDto acepta estos campos');
+        console.log('[ ] Verificar validaciones en el modelo');
+        console.log('[ ] Revisar logs del servidor para más detalles');
+        console.log('[ ] Verificar que customerId existe en la tabla Users');
+        console.log('[ ] Verificar que productId existe en la tabla Products');
+        console.log('==========================\n');
       }
     });
 

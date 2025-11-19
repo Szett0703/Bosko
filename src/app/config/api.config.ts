@@ -1,6 +1,6 @@
 export const API_CONFIG = {
-  baseUrl: 'https://localhost:5001/api',
-  backendUrl: 'https://localhost:5001', // URL base para imágenes
+  baseUrl: 'https://localhost:5006/api',
+  backendUrl: 'https://localhost:5006', // URL base para imágenes
   endpoints: {
     products: '/products',
     categories: '/categories',

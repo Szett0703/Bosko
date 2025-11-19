@@ -1,37 +1,244 @@
+<!-- Modern Admin Dashboard -->
 <div class="dashboard">
-  <section class="stats-grid">
-    <article class="stat-card" *ngFor="let stat of stats">
-      <h3>{{ stat.label }}</h3>
-      <p class="value">{{ stat.value }}</p>
-      <p class="trend" [class.positive]="stat.trend >= 0">
-        {{ stat.trend >= 0 ? '+' : '' }}{{ stat.trend }}%
-      </p>
-    </article>
-  </section>
-
-  <section class="charts-grid">
-    <div class="chart-card placeholder">
-      <h4>Ventas por Mes</h4>
-      <p>Integrar gráfico (Chart.js / ngx-charts)</p>
+  <!-- Welcome Section -->
+  <div class="welcome-banner">
+    <div class="welcome-content">
+      <h1 class="welcome-title">Bienvenido, {{ currentUser()?.name || 'Admin' }}</h1>
+      <p class="welcome-subtitle">Aquí está un resumen de tu tienda hoy</p>
     </div>
-    <div class="chart-card placeholder">
-      <h4>Pedidos por Estado</h4>
-      <p>Integrar gráfico de donas</p>
+    <div class="welcome-actions">
+      <button class="action-btn primary" (click)="refreshData()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        Actualizar
+      </button>
+      <button class="action-btn" routerLink="/admin/orders">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+        Nuevo Pedido
+      </button>
     </div>
-  </section>
+  </div>
 
-  <section class="quick-actions">
-    <a routerLink="/admin/orders" class="quick-card">
-      <h4>Revisar pedidos</h4>
-      <p>Gestiona pedidos pendientes y actualiza estados.</p>
-    </a>
-    <a routerLink="/admin/products" class="quick-card">
-      <h4>Gestionar productos</h4>
-      <p>Crea, edita y organiza el catálogo.</p>
-    </a>
-    <a routerLink="/admin/users" class="quick-card">
-      <h4>Usuarios</h4>
-      <p>Administra roles y accesos.</p>
-    </a>
-  </section>
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card" *ngFor="let stat of stats">
+      <div class="stat-icon" [ngClass]="stat.colorClass">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="stat.iconPath"></path>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">{{ stat.label }}</p>
+        <h3 class="stat-value">{{ stat.value }}</h3>
+        <div class="stat-trend" [class.positive]="stat.trend >= 0" [class.negative]="stat.trend < 0">
+          <svg *ngIf="stat.trend >= 0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+          </svg>
+          <svg *ngIf="stat.trend < 0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+          </svg>
+          <span>{{ stat.trend >= 0 ? '+' : '' }}{{ stat.trend }}%</span>
+          <span class="trend-text">vs último mes</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-section">
+    <!-- Sales Chart -->
+    <div class="chart-card large">
+      <div class="chart-header">
+        <div>
+          <h3 class="chart-title">Ventas Mensuales</h3>
+          <p class="chart-subtitle">Últimos 6 meses</p>
+        </div>
+        <select class="chart-select">
+          <option>Últimos 6 meses</option>
+          <option>Últimos 12 meses</option>
+          <option>Este año</option>
+        </select>
+      </div>
+      <div class="chart-body">
+        <canvas #salesChart></canvas>
+      </div>
+    </div>
+
+    <!-- Orders Status Chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <h3 class="chart-title">Estado de Pedidos</h3>
+          <p class="chart-subtitle">Distribución actual</p>
+        </div>
+      </div>
+      <div class="chart-body">
+        <canvas #ordersChart></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue Trend Chart -->
+  <div class="charts-section">
+    <div class="chart-card full-width">
+      <div class="chart-header">
+        <div>
+          <h3 class="chart-title">Tendencia de Ingresos</h3>
+          <p class="chart-subtitle">Comparación semanal</p>
+        </div>
+        <div class="chart-actions">
+          <button class="chart-btn active">Semana</button>
+          <button class="chart-btn">Mes</button>
+          <button class="chart-btn">Año</button>
+        </div>
+      </div>
+      <div class="chart-body">
+        <canvas #revenueChart></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Orders & Top Products -->
+  <div class="tables-section">
+    <!-- Recent Orders -->
+    <div class="table-card">
+      <div class="table-header">
+        <div>
+          <h3 class="table-title">Pedidos Recientes</h3>
+          <p class="table-subtitle">Últimos 5 pedidos</p>
+        </div>
+        <a routerLink="/admin/orders" class="view-all-link">
+          Ver todos
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+      <div class="table-body">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Cliente</th>
+              <th>Monto</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of recentOrders">
+              <td class="order-id">#{{ order.id }}</td>
+              <td>
+                <div class="customer-info">
+                  <div class="customer-avatar">{{ getInitials(order.customerName) }}</div>
+                  <span>{{ order.customerName }}</span>
+                </div>
+              </td>
+              <td class="amount">${{ order.amount }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="order.status">
+                  {{ getStatusLabel(order.status) }}
+                </span>
+              </td>
+              <td class="date">{{ order.date }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Top Products -->
+    <div class="table-card">
+      <div class="table-header">
+        <div>
+          <h3 class="table-title">Productos Más Vendidos</h3>
+          <p class="table-subtitle">Top 5 este mes</p>
+        </div>
+        <a routerLink="/admin/products" class="view-all-link">
+          Ver todos
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+      <div class="table-body">
+        <div class="product-list">
+          <div class="product-item" *ngFor="let product of topProducts">
+            <div class="product-image">
+              <img [src]="product.image" [alt]="product.name">
+            </div>
+            <div class="product-info">
+              <p class="product-name">{{ product.name }}</p>
+              <p class="product-category">{{ product.category }}</p>
+            </div>
+            <div class="product-stats">
+              <p class="product-sales">{{ product.sales }} ventas</p>
+              <p class="product-revenue">${{ product.revenue }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Feed -->
+  <div class="activity-section">
+    <div class="activity-card">
+      <div class="activity-header">
+        <h3 class="activity-title">Actividad Reciente</h3>
+        <button class="icon-btn-small">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="activity-list">
+        <div class="activity-item" *ngFor="let activity of recentActivity">
+          <div class="activity-icon" [ngClass]="activity.type">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="activity.iconPath"></path>
+            </svg>
+          </div>
+          <div class="activity-content">
+            <p class="activity-text">{{ activity.text }}</p>
+            <p class="activity-time">{{ activity.time }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions-card">
+      <h3 class="quick-actions-title">Acciones Rápidas</h3>
+      <div class="quick-actions-grid">
+        <button class="quick-action-btn" routerLink="/admin/products">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          <span>Nuevo Producto</span>
+        </button>
+        <button class="quick-action-btn" routerLink="/admin/orders">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+          <span>Ver Pedidos</span>
+        </button>
+        <button class="quick-action-btn" routerLink="/admin/categories">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+          </svg>
+          <span>Gestionar Categorías</span>
+        </button>
+        <button class="quick-action-btn" routerLink="/admin/users">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+          <span>Administrar Usuarios</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

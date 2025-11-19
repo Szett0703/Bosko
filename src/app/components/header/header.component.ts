@@ -4,10 +4,11 @@ import { Router, RouterModule } from '@angular/router';
 import { LanguageService } from '../../services/language.service';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
+import { HasRoleDirective } from '../../directives/has-role.directive';
 
 @Component({
   selector: 'app-header',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, HasRoleDirective],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })

@@ -22,31 +22,63 @@ export class AuthService {
   private loggedInSignal = signal<boolean>(false);
   public isLoggedIn = computed(() => this.loggedInSignal());
 
+  private userRoleSignal = signal<UserRole | null>(null);
+  public userRole = computed(() => this.userRoleSignal());
+
   constructor(
     private http: HttpClient,
     private router: Router
   ) {
     // Check if user is logged in on service initialization
+    this.initializeAuthState();
+  }
+
+  private initializeAuthState(): void {
     const token = this.getToken();
-    if (token) {
-      this.loggedInSignal.set(true);
-      // Optionally decode token to get user info
+    if (token && this.isTokenValid(token)) {
       const user = this.getUserFromToken(token);
       if (user) {
+        this.loggedInSignal.set(true);
         this.currentUserSubject.next(user);
+        this.userRoleSignal.set(user.role);
+      } else {
+        this.clearAuthState();
       }
+    } else {
+      this.clearAuthState();
     }
   }
 
+  private clearAuthState(): void {
+    // Remove authentication token
+    localStorage.removeItem('bosko-token');
+
+    // Clear user cart (cart is user-specific)
+    localStorage.removeItem('bosko-cart');
+
+    // Reset all auth-related signals and subjects
+    this.loggedInSignal.set(false);
+    this.currentUserSubject.next(null);
+    this.userRoleSignal.set(null);
+
+    // Note: We keep 'bosko-language' and 'bosko-remember-email'
+    // as they are browser preferences, not user data
+  }
+
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(
-      `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.auth.login}`,
-      credentials
-    ).pipe(
+    const url = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.auth.login}`;
+
+    // 🔍 DEBUG: Ver URL y body antes de enviar
+    console.log('🟢 AUTH SERVICE - Login URL:', url);
+    console.log('🟢 AUTH SERVICE - Request Body:', JSON.stringify(credentials, null, 2));
+
+    return this.http.post<AuthResponse>(url, credentials).pipe(
       tap(response => {
+        console.log('✅ AUTH SERVICE - Login exitoso:', response);
         this.setToken(response.token);
         this.currentUserSubject.next(response.user);
         this.loggedInSignal.set(true);
+        this.userRoleSignal.set(response.user.role);
       })
     );
   }
@@ -60,6 +92,7 @@ export class AuthService {
         this.setToken(response.token);
         this.currentUserSubject.next(response.user);
         this.loggedInSignal.set(true);
+        this.userRoleSignal.set(response.user.role);
       })
     );
   }
@@ -74,6 +107,7 @@ export class AuthService {
         this.setToken(response.token);
         this.currentUserSubject.next(response.user);
         this.loggedInSignal.set(true);
+        this.userRoleSignal.set(response.user.role);
       })
     );
   }
@@ -92,11 +126,37 @@ export class AuthService {
     );
   }
 
+  /**
+   * Logout user and clear all user-related data
+   * Preserves browser preferences like language and remember email
+   */
   logout(): void {
-    localStorage.removeItem('bosko-token');
-    this.currentUserSubject.next(null);
-    this.loggedInSignal.set(false);
+    console.log('🔴 Cerrando sesión y limpiando datos del usuario...');
+
+    // Clear all authentication state and user data
+    this.clearAuthState();
+
+    // Navigate to home page
     this.router.navigate(['/']);
+
+    console.log('✅ Sesión cerrada exitosamente');
+  }
+
+  /**
+   * Clear all user-related data from localStorage and memory
+   * Call this when user logs out to prevent data leakage between sessions
+   */
+  public clearAllUserData(): void {
+    // Remove all user-specific localStorage items
+    localStorage.removeItem('bosko-token');
+    localStorage.removeItem('bosko-cart');
+
+    // Reset all signals and subjects
+    this.loggedInSignal.set(false);
+    this.currentUserSubject.next(null);
+    this.userRoleSignal.set(null);
+
+    console.log('🧹 Todos los datos del usuario han sido limpiados');
   }
 
   getToken(): string | null {
@@ -109,9 +169,10 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     const token = this.getToken();
-    if (!token) return false;
+    return token ? this.isTokenValid(token) : false;
+  }
 
-    // Check if token is expired
+  private isTokenValid(token: string): boolean {
     try {
       const payload = this.decodeToken(token);
       const currentTime = Math.floor(Date.now() / 1000);
@@ -124,30 +185,55 @@ export class AuthService {
   private getUserFromToken(token: string): User | null {
     try {
       const payload = this.decodeToken(token);
+      // Handle different JWT claim formats
+      const userId = payload.sub || payload.userId || payload.nameid || payload.id;
+      const userName = payload.name || payload.unique_name || payload.given_name || 'User';
+      const userEmail = payload.email || payload.preferred_username || '';
+      const userRole = payload.role || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || 'Customer';
+
       return {
-        id: payload.sub || payload.userId,
-        name: payload.name || payload.unique_name,
-        email: payload.email,
-        role: payload.role || 'Customer',
-        provider: payload.provider || 'Local'
+        id: parseInt(userId) || 0,
+        name: userName,
+        email: userEmail,
+        role: userRole as UserRole,
+        provider: payload.provider || 'Local',
+        isActive: true,
+        createdAt: new Date()
       };
-    } catch {
+    } catch (error) {
+      console.error('Error decoding token:', error);
       return null;
     }
   }
 
   private decodeToken(token: string): any {
-    const parts = token.split('.');
-    if (parts.length !== 3) {
-      throw new Error('Invalid token format');
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        throw new Error('Invalid token format');
+      }
+      const payload = parts[1];
+      // Handle URL-safe base64
+      const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const decoded = atob(base64);
+      return JSON.parse(decoded);
+    } catch (error) {
+      console.error('Token decode error:', error);
+      throw new Error('Failed to decode token');
     }
-    const payload = parts[1];
-    const decoded = atob(payload);
-    return JSON.parse(decoded);
   }
 
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
+  }
+
+  /**
+   * Update current user data in memory
+   * Used when user updates their profile
+   */
+  updateCurrentUserData(updatedUser: User): void {
+    this.currentUserSubject.next(updatedUser);
+    console.log('✅ Datos de usuario actualizados en memoria:', updatedUser);
   }
 
   getUserRole(): UserRole | null {

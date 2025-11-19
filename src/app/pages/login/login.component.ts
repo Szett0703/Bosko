@@ -18,6 +18,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;
   loginError: string = '';
   isLoading: boolean = false;
+  showPassword: boolean = false;
   private subscriptions = new Subscription();
 
   constructor(
@@ -28,11 +29,21 @@ export class LoginComponent implements OnInit, OnDestroy {
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      rememberMe: [false]
     });
   }
 
   ngOnInit(): void {
+    // Pre-fill email if remember me was checked
+    const savedEmail = localStorage.getItem('bosko-remember-email');
+    if (savedEmail) {
+      this.loginForm.patchValue({
+        email: savedEmail,
+        rememberMe: true
+      });
+    }
+
     // Initialize Google Sign-In if available
     this.initializeGoogleSignIn();
   }
@@ -50,21 +61,79 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.loginError = '';
 
-    const credentials = this.loginForm.value;
+    const { email, password, rememberMe } = this.loginForm.value;
+    const credentials = { email, password };
+
+    // 🔍 DEBUG: Ver exactamente qué se está enviando
+    console.log('🔵 LOGIN DEBUG - URL:', 'https://localhost:5006/api/auth/login');
+    console.log('🔵 LOGIN DEBUG - Credentials:', JSON.stringify(credentials, null, 2));
+    console.log('🔵 LOGIN DEBUG - Email:', email);
+    console.log('🔵 LOGIN DEBUG - Password length:', password?.length);
+
+    // Save email if remember me is checked
+    if (rememberMe) {
+      localStorage.setItem('bosko-remember-email', email);
+    } else {
+      localStorage.removeItem('bosko-remember-email');
+    }
 
     const loginSub = this.authService.login(credentials).subscribe({
-      next: () => {
+      next: (response) => {
         this.isLoading = false;
-        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/';
-        this.router.navigate([returnUrl]);
+
+        // Get return URL or redirect based on role
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+
+        if (returnUrl) {
+          this.router.navigate([returnUrl]);
+        } else {
+          // Redirect based on user role
+          this.redirectByRole(response.user.role);
+        }
       },
       error: (err) => {
         this.isLoading = false;
-        this.loginError = err.error?.message || 'Email o contraseña incorrectos';
+
+        // 🔴 DEBUG: Ver error completo
+        console.error('❌ LOGIN ERROR - Status:', err.status);
+        console.error('❌ LOGIN ERROR - Message:', err.message);
+        console.error('❌ LOGIN ERROR - Error Body:', err.error);
+        console.error('❌ LOGIN ERROR - Full Error:', err);
+
+        this.loginError = this.getApiErrorMessage(err);
       }
     });
 
     this.subscriptions.add(loginSub);
+  }
+
+  private redirectByRole(role: string): void {
+    switch (role) {
+      case 'Admin':
+        this.router.navigate(['/admin']);
+        break;
+      case 'Employee':
+        this.router.navigate(['/admin']);
+        break;
+      case 'Customer':
+      default:
+        this.router.navigate(['/']);
+        break;
+    }
+  }
+
+  private getApiErrorMessage(err: any): string {
+    if (err.status === 401) {
+      return 'Email o contraseña incorrectos';
+    }
+    if (err.status === 0) {
+      return 'No se puede conectar al servidor. Verifica tu conexión.';
+    }
+    return err.error?.message || err.error?.title || 'Error al iniciar sesión. Intenta nuevamente.';
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 
   private initializeGoogleSignIn(): void {
@@ -83,14 +152,19 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.loginError = '';
 
       const googleSub = this.authService.googleLogin(response.credential).subscribe({
-        next: () => {
+        next: (authResponse) => {
           this.isLoading = false;
-          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/';
-          this.router.navigate([returnUrl]);
+          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+
+          if (returnUrl) {
+            this.router.navigate([returnUrl]);
+          } else {
+            this.redirectByRole(authResponse.user.role);
+          }
         },
         error: (err) => {
           this.isLoading = false;
-          this.loginError = err.error?.message || 'Error al ingresar con Google';
+          this.loginError = this.getApiErrorMessage(err);
         }
       });
 
