@@ -11,6 +11,7 @@ export interface User {
   role: UserRole;
   provider?: 'Local' | 'Google';
   isActive: boolean;
+  avatarUrl?: string;
   createdAt: Date;
   updatedAt?: Date;
   totalOrders?: number;

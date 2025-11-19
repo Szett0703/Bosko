@@ -8,7 +8,7 @@ interface Order {
   id: number;
   customerName: string;
   customerEmail: string;
-  items: number;
+  itemsCount: number;
   amount: number;
   status: 'pending' | 'processing' | 'delivered' | 'cancelled';
   createdAt: string;
@@ -73,8 +73,25 @@ export class OrderManagementComponent implements OnInit {
   // Modal
   showDetailModal: boolean = false;
   showStatusModal: boolean = false;
+  showEditModal: boolean = false;
+  showCancelModal: boolean = false;
   newStatus: string = '';
   statusNote: string = '';
+  cancelReason: string = '';
+
+  // Edit Form
+  editForm: any = {
+    shippingAddress: {
+      fullName: '',
+      phone: '',
+      street: '',
+      city: '',
+      state: '',
+      postalCode: '',
+      country: ''
+    },
+    notes: ''
+  };
 
   // Loading
   isLoading: boolean = false;
@@ -95,6 +112,13 @@ export class OrderManagementComponent implements OnInit {
       this.searchQuery
     ).subscribe({
       next: (response) => {
+        console.log('=== ADMIN ORDERS DEBUG ===');
+        console.log('Full Response:', response);
+        console.log('Orders Array:', response.orders);
+        console.log('First Order:', response.orders[0]);
+        console.log('First Order itemsCount:', response.orders[0]?.itemsCount);
+        console.log('==========================');
+
         this.orders = response.orders;
         this.filteredOrders = response.orders;
         this.totalPages = response.pagination.pages;
@@ -175,7 +199,6 @@ export class OrderManagementComponent implements OnInit {
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Error loading order details:', err);
         this.isLoading = false;
 
         let errorMsg = 'Error al cargar los detalles del pedido.\n\n';
@@ -184,22 +207,65 @@ export class OrderManagementComponent implements OnInit {
         if (err.status === 404) {
           errorMsg += 'Pedido no encontrado.';
         } else if (err.status === 500) {
-          const errorDetails = err.error?.message || err.error?.title || 'Error desconocido';
+          const errorDetails = err.error?.message || err.error?.title || err.error?.Message || 'Error interno del servidor';
+          const errorType = err.error?.type || err.error?.Type || 'Unknown';
+          const stackTrace = err.error?.stackTrace || err.error?.StackTrace || err.error?.stack || 'No disponible';
+          const innerException = err.error?.innerException || err.error?.InnerException || null;
+
           errorMsg += `Error del servidor: ${errorDetails}`;
 
-          // Generate message for backend team
-          backendMessage = `🔴 ERROR 500 EN FRONTEND - Detalles de Pedido\n\n`;
-          backendMessage += `Endpoint: GET /api/admin/orders/{id}\n`;
-          backendMessage += `ID del pedido: ${orderId}\n\n`;
-          backendMessage += `Error del servidor:\n${errorDetails}\n\n`;
-          backendMessage += `Stack trace (si está disponible):\n${err.error?.stackTrace || 'No disponible'}\n\n`;
-          backendMessage += `Por favor revisa:\n`;
-          backendMessage += `1. Que el pedido con ID ${orderId} exista en la BD\n`;
-          backendMessage += `2. Que se estén cargando correctamente las relaciones (customer, shippingAddress, orderItems, statusHistory)\n`;
-          backendMessage += `3. Los logs del servidor para más detalles`;
+          // Generate detailed message for backend team
+          backendMessage = `\n╔════════════════════════════════════════════════════════════════╗\n`;
+          backendMessage += `║   🔴 ERROR 500 EN FRONTEND - Detalles de Pedido               ║\n`;
+          backendMessage += `╚════════════════════════════════════════════════════════════════╝\n\n`;
 
-          console.error('\n=== MENSAJE PARA EL BACKEND ===\n' + backendMessage + '\n===============================\n');
-          errorMsg += '\n\n📝 Mensaje copiado en consola para enviar al backend.';
+          backendMessage += `📍 ENDPOINT:\n`;
+          backendMessage += `   GET /api/admin/orders/${orderId}\n\n`;
+
+          backendMessage += `📋 PARÁMETROS:\n`;
+          backendMessage += `   - Order ID: ${orderId}\n`;
+          backendMessage += `   - Timestamp: ${new Date().toISOString()}\n\n`;
+
+          backendMessage += `⚠️ ERROR DEL SERVIDOR:\n`;
+          backendMessage += `   Type: ${errorType}\n`;
+          backendMessage += `   Message: ${errorDetails}\n\n`;
+
+          if (stackTrace !== 'No disponible') {
+            backendMessage += `📜 STACK TRACE:\n`;
+            backendMessage += `${stackTrace}\n\n`;
+          }
+
+          if (innerException) {
+            backendMessage += `🔍 INNER EXCEPTION:\n`;
+            backendMessage += `${JSON.stringify(innerException, null, 2)}\n\n`;
+          }
+
+          backendMessage += `✅ CHECKLIST PARA DEBUGGING:\n`;
+          backendMessage += `   [ ] 1. Verificar que el pedido con ID ${orderId} exista en la base de datos\n`;
+          backendMessage += `   [ ] 2. Revisar que las relaciones se carguen correctamente:\n`;
+          backendMessage += `       - Customer (Users table)\n`;
+          backendMessage += `       - ShippingAddress (Addresses table)\n`;
+          backendMessage += `       - OrderItems (OrderItems table con Product)\n`;
+          backendMessage += `       - StatusHistory (OrderStatusHistory table)\n`;
+          backendMessage += `   [ ] 3. Verificar configuración de Entity Framework:\n`;
+          backendMessage += `       - .Include() o .ThenInclude() para navegación\n`;
+          backendMessage += `       - Foreign keys correctamente configuradas\n`;
+          backendMessage += `   [ ] 4. Revisar los logs del servidor (appsettings.json LogLevel)\n`;
+          backendMessage += `   [ ] 5. Verificar que el DTO OrderDetailDto tenga todas las propiedades\n`;
+          backendMessage += `   [ ] 6. Comprobar que AutoMapper esté configurado correctamente\n\n`;
+
+          backendMessage += `🔧 POSIBLES CAUSAS:\n`;
+          backendMessage += `   - Relación no cargada (NullReferenceException)\n`;
+          backendMessage += `   - Foreign key NULL cuando no debería serlo\n`;
+          backendMessage += `   - Error de mapeo en el DTO\n`;
+          backendMessage += `   - Referencia circular no configurada en JSON serialization\n\n`;
+
+          backendMessage += `📦 ERROR COMPLETO (JSON):\n`;
+          backendMessage += JSON.stringify(err.error, null, 2);
+          backendMessage += `\n\n═══════════════════════════════════════════════════════════════\n`;
+
+          console.error(backendMessage);
+          errorMsg += '\n\n📝 Mensaje detallado copiado en consola para enviar al backend.';
         } else {
           errorMsg += `Error ${err.status}: ${err.statusText || 'Error desconocido'}`;
         }
@@ -353,5 +419,93 @@ export class OrderManagementComponent implements OnInit {
 
   refreshOrders(): void {
     this.loadOrders();
+  }
+
+  // Edit Order
+  openEditModal(order: Order): void {
+    this.viewOrderDetails(order.id);
+    setTimeout(() => {
+      if (this.selectedOrder) {
+        this.editForm = {
+          shippingAddress: { ...this.selectedOrder.shippingAddress },
+          notes: '' // Backend will need to provide notes
+        };
+        this.showEditModal = true;
+        this.showDetailModal = false;
+      }
+    }, 500);
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+    this.editForm = {
+      shippingAddress: {
+        fullName: '',
+        phone: '',
+        street: '',
+        city: '',
+        state: '',
+        postalCode: '',
+        country: ''
+      },
+      notes: ''
+    };
+  }
+
+  saveOrderChanges(): void {
+    if (!this.selectedOrder) return;
+
+    this.isLoading = true;
+
+    this.orderService.updateOrder(this.selectedOrder.id, this.editForm).subscribe({
+      next: () => {
+        this.isLoading = false;
+        alert('Pedido actualizado exitosamente');
+        this.closeEditModal();
+        this.loadOrders();
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Error updating order:', err);
+        const errorMsg = err.error?.message || 'Error al actualizar el pedido';
+        alert(errorMsg);
+      }
+    });
+  }
+
+  // Cancel Order
+  openCancelModal(order: Order): void {
+    this.selectedOrder = order as OrderDetail;
+    this.cancelReason = '';
+    this.showCancelModal = true;
+  }
+
+  closeCancelModal(): void {
+    this.showCancelModal = false;
+    this.cancelReason = '';
+  }
+
+  confirmCancelOrder(): void {
+    if (!this.selectedOrder || !this.cancelReason.trim()) {
+      alert('Por favor ingresa una razón para cancelar el pedido');
+      return;
+    }
+
+    this.isLoading = true;
+
+    this.orderService.cancelOrder(this.selectedOrder.id, this.cancelReason).subscribe({
+      next: () => {
+        this.isLoading = false;
+        alert('Pedido cancelado exitosamente');
+        this.closeCancelModal();
+        this.loadOrders();
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Error canceling order:', err);
+        const errorMsg = err.error?.message || 'Error al cancelar el pedido';
+        alert(errorMsg);
+      }
+    });
   }
 }

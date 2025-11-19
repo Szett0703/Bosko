@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 const API_URL = 'https://localhost:5006';
 
@@ -9,7 +10,7 @@ interface OrderListResponse {
     id: number;
     customerName: string;
     customerEmail: string;
-    items: number;
+    itemsCount: number;
     amount: number;
     status: 'pending' | 'processing' | 'delivered' | 'cancelled';
     createdAt: string;
@@ -27,7 +28,7 @@ interface OrderDetailResponse {
   id: number;
   customerName: string;
   customerEmail: string;
-  items: number;
+  itemsCount: number;
   amount: number;
   status: 'pending' | 'processing' | 'delivered' | 'cancelled';
   createdAt: string;
@@ -103,15 +104,37 @@ export class OrderAdminService {
       params = params.set('search', search.trim());
     }
 
-    return this.http.get<OrderListResponse>(this.apiUrl, { params });
+    // ⚠️ TEMPORARY FIX: Backend sends 'items' instead of 'itemsCount'
+    // TODO: Remove this mapping once backend is fixed to send 'itemsCount'
+    return this.http.get<any>(this.apiUrl, { params }).pipe(
+      map((response: any) => ({
+        orders: response.orders.map((order: any) => ({
+          ...order,
+          itemsCount: order.items !== undefined ? order.items : 0
+        })),
+        pagination: response.pagination
+      }))
+    );
   }
 
   /**
-   * Get detailed information for a specific order
+   * Get details of a specific order
    * @param id Order ID
    */
   getOrderDetails(id: number): Observable<OrderDetailResponse> {
-    return this.http.get<OrderDetailResponse>(`${this.apiUrl}/${id}`);
+    return this.http.get<OrderDetailResponse>(`${this.apiUrl}/${id}`).pipe(
+      catchError((error) => {
+        console.error('❌ Error en getOrderDetails:', {
+          orderId: id,
+          status: error.status,
+          statusText: error.statusText,
+          errorResponse: error.error,
+          url: error.url,
+          message: error.message
+        });
+        throw error;
+      })
+    );
   }
 
   /**
@@ -130,5 +153,27 @@ export class OrderAdminService {
       body.note = note.trim();
     }
     return this.http.put<UpdateStatusResponse>(`${this.apiUrl}/${id}/status`, body);
+  }
+
+  /**
+   * Update order address and notes
+   * @param id Order ID
+   * @param data Update data (shippingAddress, notes)
+   */
+  updateOrder(id: number, data: any): Observable<OrderDetailResponse> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, data).pipe(
+      map(response => response.data)
+    );
+  }
+
+  /**
+   * Cancel an order
+   * @param id Order ID
+   * @param reason Cancellation reason
+   */
+  cancelOrder(id: number, reason: string): Observable<boolean> {
+    return this.http.post<any>(`${this.apiUrl}/${id}/cancel`, { reason }).pipe(
+      map(response => response.data)
+    );
   }
 }

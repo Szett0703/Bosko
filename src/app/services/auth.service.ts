@@ -50,10 +50,19 @@ export class AuthService {
   }
 
   private clearAuthState(): void {
+    // Remove authentication token
     localStorage.removeItem('bosko-token');
+
+    // Clear user cart (cart is user-specific)
+    localStorage.removeItem('bosko-cart');
+
+    // Reset all auth-related signals and subjects
     this.loggedInSignal.set(false);
     this.currentUserSubject.next(null);
     this.userRoleSignal.set(null);
+
+    // Note: We keep 'bosko-language' and 'bosko-remember-email'
+    // as they are browser preferences, not user data
   }
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
@@ -117,9 +126,37 @@ export class AuthService {
     );
   }
 
+  /**
+   * Logout user and clear all user-related data
+   * Preserves browser preferences like language and remember email
+   */
   logout(): void {
+    console.log('🔴 Cerrando sesión y limpiando datos del usuario...');
+
+    // Clear all authentication state and user data
     this.clearAuthState();
+
+    // Navigate to home page
     this.router.navigate(['/']);
+
+    console.log('✅ Sesión cerrada exitosamente');
+  }
+
+  /**
+   * Clear all user-related data from localStorage and memory
+   * Call this when user logs out to prevent data leakage between sessions
+   */
+  public clearAllUserData(): void {
+    // Remove all user-specific localStorage items
+    localStorage.removeItem('bosko-token');
+    localStorage.removeItem('bosko-cart');
+
+    // Reset all signals and subjects
+    this.loggedInSignal.set(false);
+    this.currentUserSubject.next(null);
+    this.userRoleSignal.set(null);
+
+    console.log('🧹 Todos los datos del usuario han sido limpiados');
   }
 
   getToken(): string | null {
@@ -188,6 +225,15 @@ export class AuthService {
 
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
+  }
+
+  /**
+   * Update current user data in memory
+   * Used when user updates their profile
+   */
+  updateCurrentUserData(updatedUser: User): void {
+    this.currentUserSubject.next(updatedUser);
+    console.log('✅ Datos de usuario actualizados en memoria:', updatedUser);
   }
 
   getUserRole(): UserRole | null {
