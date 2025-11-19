@@ -1,7 +1,10 @@
-import { Component, OnInit, computed } from '@angular/core';
+import { Component, OnInit, computed, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { Chart, registerables } from 'chart.js';
+
+Chart.register(...registerables);
 
 interface DashboardStat {
   label: string;
@@ -41,10 +44,16 @@ interface Activity {
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.css'
 })
-export class AdminDashboardComponent implements OnInit {
-  currentUser = computed(() => this.authService.getCurrentUser());
+export class AdminDashboardComponent implements OnInit, AfterViewInit {
+  @ViewChild('salesChart') salesChartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('ordersChart') ordersChartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('revenueChart') revenueChartRef!: ElementRef<HTMLCanvasElement>;
 
-  // Dashboard Statistics
+  private salesChart?: Chart;
+  private ordersChart?: Chart;
+  private revenueChart?: Chart;
+
+  currentUser = computed(() => this.authService.getCurrentUser());  // Dashboard Statistics
   stats: DashboardStat[] = [
     {
       label: 'Ventas Totales',
@@ -194,8 +203,297 @@ export class AdminDashboardComponent implements OnInit {
     // Data will be loaded from backend when service is integrated
   }
 
+  ngAfterViewInit(): void {
+    this.initSalesChart();
+    this.initOrdersChart();
+    this.initRevenueChart();
+  }
+
+  private initSalesChart(): void {
+    const ctx = this.salesChartRef.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    this.salesChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+        datasets: [
+          {
+            label: 'Ventas 2025',
+            data: [12000, 15000, 18000, 22000, 25000, 28000],
+            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+            borderColor: 'rgba(59, 130, 246, 1)',
+            borderWidth: 2,
+            borderRadius: 8,
+          },
+          {
+            label: 'Ventas 2024',
+            data: [10000, 13000, 16000, 19000, 21000, 23000],
+            backgroundColor: 'rgba(139, 92, 246, 0.6)',
+            borderColor: 'rgba(139, 92, 246, 1)',
+            borderWidth: 2,
+            borderRadius: 8,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            labels: {
+              color: '#cbd5e1',
+              font: {
+                size: 12,
+                family: 'Inter, system-ui, sans-serif'
+              },
+              padding: 15,
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            titleColor: '#f8fafc',
+            bodyColor: '#cbd5e1',
+            borderColor: '#334155',
+            borderWidth: 1,
+            padding: 12,
+            displayColors: true,
+            callbacks: {
+              label: function(context) {
+                const value = context.parsed.y ?? 0;
+                return context.dataset.label + ': $' + value.toLocaleString();
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(51, 65, 85, 0.3)'
+            },
+            ticks: {
+              color: '#94a3b8',
+              callback: function(value) {
+                return '$' + (value as number / 1000) + 'k';
+              }
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              color: '#94a3b8'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  private initOrdersChart(): void {
+    const ctx = this.ordersChartRef.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    this.ordersChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Pendientes', 'Procesando', 'Entregados', 'Cancelados'],
+        datasets: [{
+          data: [40, 30, 25, 5],
+          backgroundColor: [
+            'rgba(251, 146, 60, 0.8)',
+            'rgba(59, 130, 246, 0.8)',
+            'rgba(16, 185, 129, 0.8)',
+            'rgba(239, 68, 68, 0.8)'
+          ],
+          borderColor: [
+            'rgba(251, 146, 60, 1)',
+            'rgba(59, 130, 246, 1)',
+            'rgba(16, 185, 129, 1)',
+            'rgba(239, 68, 68, 1)'
+          ],
+          borderWidth: 2,
+          hoverOffset: 10
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: {
+              color: '#cbd5e1',
+              font: {
+                size: 12,
+                family: 'Inter, system-ui, sans-serif'
+              },
+              padding: 15,
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            titleColor: '#f8fafc',
+            bodyColor: '#cbd5e1',
+            borderColor: '#334155',
+            borderWidth: 1,
+            padding: 12,
+            callbacks: {
+              label: function(context) {
+                const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
+                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+              }
+            }
+          }
+        },
+        cutout: '65%'
+      }
+    });
+  }
+
+  private initRevenueChart(): void {
+    const ctx = this.revenueChartRef.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    this.revenueChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+        datasets: [
+          {
+            label: 'Semana Actual',
+            data: [3200, 4100, 3800, 5200, 4800, 6500, 5900],
+            borderColor: 'rgba(59, 130, 246, 1)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(59, 130, 246, 1)',
+            pointHoverBorderWidth: 3
+          },
+          {
+            label: 'Semana Anterior',
+            data: [2800, 3500, 3200, 4100, 4200, 5800, 5200],
+            borderColor: 'rgba(139, 92, 246, 1)',
+            backgroundColor: 'rgba(139, 92, 246, 0.05)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            pointBackgroundColor: 'rgba(139, 92, 246, 1)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            borderDash: [5, 5]
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            labels: {
+              color: '#cbd5e1',
+              font: {
+                size: 12,
+                family: 'Inter, system-ui, sans-serif'
+              },
+              padding: 15,
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            titleColor: '#f8fafc',
+            bodyColor: '#cbd5e1',
+            borderColor: '#334155',
+            borderWidth: 1,
+            padding: 12,
+            displayColors: true,
+            callbacks: {
+              label: function(context) {
+                const value = context.parsed.y ?? 0;
+                return context.dataset.label + ': $' + value.toLocaleString();
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(51, 65, 85, 0.3)'
+            },
+            ticks: {
+              color: '#94a3b8',
+              callback: function(value) {
+                return '$' + (value as number / 1000) + 'k';
+              }
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              color: '#94a3b8'
+            }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        }
+      }
+    });
+  }
+
   refreshData(): void {
     console.log('Refreshing dashboard data...');
+    // Actualizar datos de los gráficos
+    if (this.salesChart) {
+      this.salesChart.data.datasets[0].data = [
+        Math.random() * 30000,
+        Math.random() * 30000,
+        Math.random() * 30000,
+        Math.random() * 30000,
+        Math.random() * 30000,
+        Math.random() * 30000
+      ];
+      this.salesChart.update();
+    }
+    if (this.revenueChart) {
+      this.revenueChart.data.datasets[0].data = [
+        Math.random() * 7000,
+        Math.random() * 7000,
+        Math.random() * 7000,
+        Math.random() * 7000,
+        Math.random() * 7000,
+        Math.random() * 7000,
+        Math.random() * 7000
+      ];
+      this.revenueChart.update();
+    }
   }
 
   getInitials(name: string): string {

@@ -63,14 +63,7 @@
         </select>
       </div>
       <div class="chart-body">
-        <!-- Placeholder for Chart.js or ngx-charts -->
-        <div class="chart-placeholder">
-          <svg class="placeholder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-          </svg>
-          <p>Gráfico de barras - Integrar Chart.js o ngx-charts</p>
-          <p class="placeholder-data">Datos de ejemplo: Ene: $12k, Feb: $15k, Mar: $18k, Abr: $22k, May: $25k, Jun: $28k</p>
-        </div>
+        <canvas #salesChart></canvas>
       </div>
     </div>
 
@@ -83,31 +76,27 @@
         </div>
       </div>
       <div class="chart-body">
-        <div class="chart-placeholder donut">
-          <svg class="placeholder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
-          </svg>
-          <p>Gráfico de donas</p>
-          <div class="donut-legend">
-            <div class="legend-item">
-              <span class="legend-color pending"></span>
-              <span>Pendientes (40%)</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color processing"></span>
-              <span>Procesando (30%)</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color delivered"></span>
-              <span>Entregados (25%)</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color cancelled"></span>
-              <span>Cancelados (5%)</span>
-            </div>
-          </div>
+        <canvas #ordersChart></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue Trend Chart -->
+  <div class="charts-section">
+    <div class="chart-card full-width">
+      <div class="chart-header">
+        <div>
+          <h3 class="chart-title">Tendencia de Ingresos</h3>
+          <p class="chart-subtitle">Comparación semanal</p>
         </div>
+        <div class="chart-actions">
+          <button class="chart-btn active">Semana</button>
+          <button class="chart-btn">Mes</button>
+          <button class="chart-btn">Año</button>
+        </div>
+      </div>
+      <div class="chart-body">
+        <canvas #revenueChart></canvas>
       </div>
     </div>
   </div>

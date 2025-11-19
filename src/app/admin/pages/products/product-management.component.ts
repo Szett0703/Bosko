@@ -56,6 +56,8 @@ export class ProductManagementComponent implements OnInit {
     categoryId: undefined
   };
 
+  formTouched = false;
+
   constructor(
     private productService: ProductAdminService,
     private categoryService: CategoryAdminService
@@ -64,6 +66,27 @@ export class ProductManagementComponent implements OnInit {
   ngOnInit() {
     this.loadProducts();
     this.loadCategories();
+  }
+
+  // Helper methods
+  getInStockCount(): number {
+    return this.products.filter(p => p.stock > 0).length;
+  }
+
+  getTotalValue(): string {
+    const total = this.products.reduce((sum, p) => sum + (p.price * p.stock), 0);
+    return total.toFixed(2);
+  }
+
+  formatDate(date: Date | string): string {
+    if (!date) return 'N/A';
+    const d = new Date(date);
+    return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  onImageError(): void {
+    this.error = 'La URL de la imagen no es válida';
+    setTimeout(() => this.error = '', 3000);
   }
 
   /**
@@ -189,6 +212,8 @@ Por favor revisa:
       image: '',
       categoryId: undefined
     };
+    this.formTouched = false;
+    this.error = '';
     this.showModal = true;
   }
 
@@ -213,20 +238,52 @@ Por favor revisa:
    * Close modal
    */
   closeModal() {
+    if (this.loading) return;
     this.showModal = false;
     this.selectedProduct = null;
+    this.formTouched = false;
+    this.error = '';
   }
 
   /**
    * Save product (create or update)
    */
   saveProduct() {
-    if (!this.productForm.name || this.productForm.price <= 0 || this.productForm.stock < 0) {
-      alert('Por favor completa todos los campos requeridos');
+    this.formTouched = true;
+
+    // Validaciones del formulario
+    if (!this.productForm.name || !this.productForm.name.trim()) {
+      this.error = 'El nombre del producto es requerido';
+      setTimeout(() => this.error = '', 3000);
+      return;
+    }
+
+    if (this.productForm.name.length < 3) {
+      this.error = 'El nombre debe tener al menos 3 caracteres';
+      setTimeout(() => this.error = '', 3000);
+      return;
+    }
+
+    if (this.productForm.price <= 0) {
+      this.error = 'El precio debe ser mayor a 0';
+      setTimeout(() => this.error = '', 3000);
+      return;
+    }
+
+    if (this.productForm.stock < 0) {
+      this.error = 'El stock no puede ser negativo';
+      setTimeout(() => this.error = '', 3000);
+      return;
+    }
+
+    if (!this.productForm.categoryId) {
+      this.error = 'Debes seleccionar una categoría';
+      setTimeout(() => this.error = '', 3000);
       return;
     }
 
     this.loading = true;
+    this.error = '';
 
     const operation = this.modalMode === 'create'
       ? this.productService.createProduct(this.productForm)
@@ -234,13 +291,14 @@ Por favor revisa:
 
     operation.subscribe({
       next: (response) => {
+        this.loading = false;
         if (response.success) {
           this.closeModal();
           this.loadProducts();
         } else {
-          alert(response.message || 'Error al guardar producto');
+          this.error = response.message || 'Error al guardar producto';
+          setTimeout(() => this.error = '', 5000);
         }
-        this.loading = false;
       },
       error: (err) => {
         this.loading = false;
@@ -262,10 +320,11 @@ Por favor revisa:
 ===============================
           `;
           console.error(backendMessage);
-          alert('Error del servidor. Revisa la consola para enviar el mensaje al backend.');
+          this.error = 'Error del servidor. Revisa la consola para más detalles.';
         } else {
-          alert(err.error?.message || 'Error al guardar producto');
+          this.error = err.error?.message || 'Error al guardar producto';
         }
+        setTimeout(() => this.error = '', 5000);
       }
     });
   }
@@ -274,7 +333,9 @@ Por favor revisa:
    * Delete product
    */
   deleteProduct(product: Product) {
-    if (!confirm(`¿Eliminar el producto "${product.name}"?`)) {
+    const message = `⚠️ ¿Eliminar el producto "${product.name}"?\n\nEsta acción no se puede deshacer.${product.stock > 0 ? '\n\n⚡ Este producto tiene ' + product.stock + ' unidades en stock.' : ''}`;
+
+    if (!confirm(message)) {
       return;
     }
 
@@ -282,12 +343,13 @@ Por favor revisa:
 
     this.productService.deleteProduct(product.id).subscribe({
       next: (response) => {
+        this.loading = false;
         if (response.success) {
           this.loadProducts();
         } else {
-          alert(response.message || 'Error al eliminar producto');
+          this.error = response.message || 'Error al eliminar producto';
+          setTimeout(() => this.error = '', 5000);
         }
-        this.loading = false;
       },
       error: (err) => {
         this.loading = false;
@@ -307,10 +369,11 @@ Por favor revisa:
 ===============================
           `;
           console.error(backendMessage);
-          alert('Error del servidor. Revisa la consola para enviar el mensaje al backend.');
+          this.error = 'Error del servidor. Revisa la consola para más detalles.';
         } else {
-          alert(err.error?.message || 'Error al eliminar producto');
+          this.error = err.error?.message || 'Error al eliminar producto';
         }
+        setTimeout(() => this.error = '', 5000);
       }
     });
   }

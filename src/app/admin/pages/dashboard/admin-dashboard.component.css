@@ -205,11 +205,43 @@
   border: 1px solid #f3f4f6;
 }
 
+.chart-card.full-width {
+  grid-column: 1 / -1;
+}
+
 .chart-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1.5rem;
+}
+
+.chart-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chart-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  color: #6b7280;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chart-btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.chart-btn.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
 }
 
 .chart-title {
@@ -237,6 +269,15 @@
 
 .chart-body {
   min-height: 300px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-body canvas {
+  max-height: 350px;
+  width: 100% !important;
 }
 
 /* Chart Placeholder */

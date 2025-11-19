@@ -1,0 +1,396 @@
+<div class="orders-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Mis Pedidos</h1>
+      <p class="page-subtitle">Gestiona y realiza seguimiento de tus pedidos</p>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon-wrapper" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <p class="stat-label">Total de Pedidos</p>
+        <p class="stat-value">{{ statusCounts().total }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrapper" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <p class="stat-label">Pendientes</p>
+        <p class="stat-value">{{ statusCounts().pending }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrapper" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <p class="stat-label">En Proceso</p>
+        <p class="stat-value">{{ statusCounts().processing }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrapper" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <p class="stat-label">Entregados</p>
+        <p class="stat-value">{{ statusCounts().delivered }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label class="filter-label">Buscar</label>
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Buscar por número de orden o producto..."
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="searchQuery.set($event)">
+    </div>
+
+    <div class="filter-group">
+      <label class="filter-label">Estado</label>
+      <select
+        class="filter-select"
+        [(ngModel)]="selectedStatus"
+        (ngModelChange)="selectedStatus.set($event)">
+        <option value="all">Todos</option>
+        <option value="pending">Pendiente</option>
+        <option value="processing">Procesando</option>
+        <option value="delivered">Entregado</option>
+        <option value="cancelled">Cancelado</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando pedidos...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage()" class="error-container">
+    <p>{{ errorMessage() }}</p>
+    <button class="btn-retry" (click)="loadOrders()">Reintentar</button>
+  </div>
+
+  <!-- Orders List -->
+  <div *ngIf="!isLoading() && !errorMessage()" class="orders-container">
+    <!-- Empty State -->
+    <div *ngIf="filteredOrders().length === 0" class="empty-state">
+      <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+      </svg>
+      <h3>No hay pedidos</h3>
+      <p>Aún no has realizado ningún pedido</p>
+      <a routerLink="/collections" class="btn-primary">Explorar Productos</a>
+    </div>
+
+    <!-- Orders Grid -->
+    <div *ngIf="filteredOrders().length > 0" class="orders-grid">
+      <div *ngFor="let order of filteredOrders()" class="order-card">
+        <div class="order-header">
+          <div class="order-number-section">
+            <span class="order-label">Pedido</span>
+            <span class="order-number">{{ order.orderNumber }}</span>
+          </div>
+          <span class="order-status" [ngClass]="getStatusClass(order.status)">
+            {{ getStatusIcon(order.status) }} {{ getStatusLabel(order.status) }}
+          </span>
+        </div>
+
+        <div class="order-date">
+          <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          {{ formatDate(order.date) }}
+        </div>
+
+        <div class="order-items">
+          <p class="items-label">Productos ({{ order.items.length }})</p>
+          <div class="items-preview">
+            <div *ngFor="let item of order.items.slice(0, 3)" class="item-preview">
+              <span class="item-name">{{ item.productName }}</span>
+              <span class="item-quantity">x{{ item.quantity }}</span>
+            </div>
+            <p *ngIf="order.items.length > 3" class="items-more">
+              +{{ order.items.length - 3 }} más
+            </p>
+          </div>
+        </div>
+
+        <div class="order-total">
+          <span class="total-label">Total</span>
+          <span class="total-amount">{{ formatCurrency(order.total) }}</span>
+        </div>
+
+        <div class="order-actions">
+          <button class="btn-view" (click)="openDetailsModal(order)">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+            Ver Detalles
+          </button>
+          <button
+            *ngIf="canEditOrder(order)"
+            class="btn-edit"
+            (click)="openEditModal(order)">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+            Editar
+          </button>
+          <button
+            *ngIf="canCancelOrder(order)"
+            class="btn-cancel"
+            (click)="openCancelModal(order)">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Detalles -->
+  <div *ngIf="showDetailsModal()" class="modal-overlay" (click)="closeDetailsModal()">
+    <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Detalles del Pedido</h2>
+        <button class="btn-close" (click)="closeDetailsModal()">×</button>
+      </div>
+
+      <div *ngIf="selectedOrder()" class="modal-body">
+        <div class="details-grid">
+          <div class="detail-section">
+            <h3 class="section-title">Información del Pedido</h3>
+            <div class="detail-row">
+              <span class="detail-label">Número de Orden:</span>
+              <span class="detail-value">{{ selectedOrder()!.orderNumber }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Estado:</span>
+              <span class="order-status" [ngClass]="getStatusClass(selectedOrder()!.status)">
+                {{ getStatusIcon(selectedOrder()!.status) }} {{ getStatusLabel(selectedOrder()!.status) }}
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Fecha:</span>
+              <span class="detail-value">{{ formatDate(selectedOrder()!.date) }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedOrder()!.trackingNumber">
+              <span class="detail-label">Nº de Rastreo:</span>
+              <span class="detail-value tracking">{{ selectedOrder()!.trackingNumber }}</span>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3 class="section-title">Dirección de Envío</h3>
+            <div class="address-box">
+              <p><strong>{{ selectedOrder()!.shippingAddress.fullName }}</strong></p>
+              <p>{{ selectedOrder()!.shippingAddress.phone }}</p>
+              <p>{{ selectedOrder()!.shippingAddress.street }}</p>
+              <p>{{ selectedOrder()!.shippingAddress.city }}, {{ selectedOrder()!.shippingAddress.state }}</p>
+              <p>{{ selectedOrder()!.shippingAddress.postalCode }}, {{ selectedOrder()!.shippingAddress.country }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3 class="section-title">Productos</h3>
+          <div class="products-table">
+            <div class="table-row table-header">
+              <div class="col-product">Producto</div>
+              <div class="col-quantity">Cantidad</div>
+              <div class="col-price">Precio</div>
+              <div class="col-total">Subtotal</div>
+            </div>
+            <div *ngFor="let item of selectedOrder()!.items" class="table-row">
+              <div class="col-product">{{ item.productName }}</div>
+              <div class="col-quantity">{{ item.quantity }}</div>
+              <div class="col-price">{{ formatCurrency(item.unitPrice) }}</div>
+              <div class="col-total">{{ formatCurrency(item.subtotal) }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="order-summary">
+          <div class="summary-row">
+            <span>Subtotal:</span>
+            <span>{{ formatCurrency(selectedOrder()!.subtotal) }}</span>
+          </div>
+          <div class="summary-row">
+            <span>Impuestos:</span>
+            <span>{{ formatCurrency(selectedOrder()!.tax) }}</span>
+          </div>
+          <div class="summary-row">
+            <span>Envío:</span>
+            <span>{{ formatCurrency(selectedOrder()!.shippingCost) }}</span>
+          </div>
+          <div class="summary-row total-row">
+            <span>Total:</span>
+            <span>{{ formatCurrency(selectedOrder()!.total) }}</span>
+          </div>
+        </div>
+
+        <div *ngIf="selectedOrder()!.notes" class="notes-section">
+          <h4>Notas:</h4>
+          <p>{{ selectedOrder()!.notes }}</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeDetailsModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Edición -->
+  <div *ngIf="showEditModal()" class="modal-overlay" (click)="closeEditModal()">
+    <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Editar Pedido</h2>
+        <button class="btn-close" (click)="closeEditModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="info-message">
+          ℹ️ Solo puedes editar la dirección de envío y las notas mientras el pedido esté en estado Pendiente.
+        </p>
+
+        <div class="form-section">
+          <h3 class="section-title">Dirección de Envío</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Nombre Completo</label>
+              <input
+                type="text"
+                class="form-input"
+                [(ngModel)]="editFormData.shippingAddress.fullName">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Teléfono</label>
+              <input
+                type="tel"
+                class="form-input"
+                [(ngModel)]="editFormData.shippingAddress.phone">
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">Calle y Número</label>
+              <input
+                type="text"
+                class="form-input"
+                [(ngModel)]="editFormData.shippingAddress.street">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Ciudad</label>
+              <input
+                type="text"
+                class="form-input"
+                [(ngModel)]="editFormData.shippingAddress.city">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Estado/Provincia</label>
+              <input
+                type="text"
+                class="form-input"
+                [(ngModel)]="editFormData.shippingAddress.state">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Código Postal</label>
+              <input
+                type="text"
+                class="form-input"
+                [(ngModel)]="editFormData.shippingAddress.postalCode">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">País</label>
+              <input
+                type="text"
+                class="form-input"
+                [(ngModel)]="editFormData.shippingAddress.country">
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">Notas (opcional)</label>
+              <textarea
+                class="form-textarea"
+                rows="3"
+                placeholder="Instrucciones especiales de entrega..."
+                [(ngModel)]="editFormData.notes"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeEditModal()">Cancelar</button>
+        <button class="btn-primary" (click)="saveOrderChanges()">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Cancelación -->
+  <div *ngIf="showCancelModal()" class="modal-overlay" (click)="closeCancelModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Cancelar Pedido</h2>
+        <button class="btn-close" (click)="closeCancelModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="warning-message">
+          ⚠️ ¿Estás seguro de que deseas cancelar este pedido?
+        </p>
+        <p>Pedido: <strong>{{ selectedOrder()?.orderNumber }}</strong></p>
+
+        <div class="form-group">
+          <label class="form-label">Motivo de cancelación *</label>
+          <textarea
+            class="form-textarea"
+            rows="4"
+            placeholder="Por favor, indica el motivo de la cancelación..."
+            [(ngModel)]="cancelReason"
+            (ngModelChange)="cancelReason.set($event)"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeCancelModal()">No, mantener pedido</button>
+        <button class="btn-danger" (click)="confirmCancelOrder()">Sí, cancelar pedido</button>
+      </div>
+    </div>
+  </div>
+</div>

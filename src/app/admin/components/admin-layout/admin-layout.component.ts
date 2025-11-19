@@ -20,8 +20,17 @@ export class AdminLayoutComponent implements OnInit {
   notifications = 5; // TODO: Get from backend
   currentPage = 'Dashboard';
 
+  // Submenu state
+  isAdminSubmenuOpen = false;
+
   currentUser = computed(() => this.authService.getCurrentUser());
   currentLang = computed(() => this.languageService.getCurrentLanguage());
+
+  // Check if user is admin
+  isAdmin = computed(() => {
+    const user = this.authService.getCurrentUser();
+    return user?.role === 'Admin';
+  });
 
   constructor(
     private authService: AuthService,
@@ -59,6 +68,10 @@ export class AdminLayoutComponent implements OnInit {
 
   getCurrentPageTitle(): string {
     return this.currentPage;
+  }
+
+  toggleAdminSubmenu(): void {
+    this.isAdminSubmenuOpen = !this.isAdminSubmenuOpen;
   }
 
   private updatePageTitle(): void {

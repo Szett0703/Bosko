@@ -53,7 +53,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.isLoadingOrders = true;
     this.ordersError = '';
 
-    const ordersSub = this.orderService.getOrders().subscribe({
+    const user = this.authService.getCurrentUser();
+    if (!user) {
+      this.ordersError = 'Usuario no autenticado.';
+      this.isLoadingOrders = false;
+      return;
+    }
+
+    const ordersSub = this.orderService.getMyOrders(user.id).subscribe({
       next: (orders) => {
         this.orders = orders;
         this.isLoadingOrders = false;
@@ -80,5 +87,15 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   toggleLanguage() {
     this.languageService.toggleLanguage();
+  }
+
+  getStatusLabel(status: string): string {
+    const labels: Record<string, string> = {
+      'pending': 'Pendiente',
+      'processing': 'Procesando',
+      'delivered': 'Entregado',
+      'cancelled': 'Cancelado'
+    };
+    return labels[status] || status;
   }
 }

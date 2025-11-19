@@ -73,15 +73,36 @@
         </a>
       </div>
 
-      <div class="nav-section">
-        <p class="nav-section-title" *ngIf="!isSidebarCollapsed">GESTIÓN</p>
+      <!-- Admin Only Section -->
+      <div class="nav-section" *ngIf="isAdmin()">
+        <p class="nav-section-title" *ngIf="!isSidebarCollapsed">ADMINISTRACIÓN</p>
 
-        <a routerLink="/admin/users" routerLinkActive="active" class="nav-item">
-          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-          </svg>
-          <span class="nav-text" *ngIf="!isSidebarCollapsed">Usuarios</span>
-        </a>
+        <!-- Users Menu with Submenu -->
+        <div class="nav-item-container">
+          <button
+            class="nav-item nav-item-expandable"
+            [class.active]="isAdminSubmenuOpen"
+            (click)="toggleAdminSubmenu()"
+            type="button">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+            <span class="nav-text" *ngIf="!isSidebarCollapsed">Usuarios</span>
+            <svg class="nav-arrow" *ngIf="!isSidebarCollapsed" [class.rotated]="isAdminSubmenuOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+
+          <!-- Submenu -->
+          <div class="nav-submenu" *ngIf="isAdminSubmenuOpen && !isSidebarCollapsed">
+            <a routerLink="/admin/users" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-subitem">
+              <svg class="nav-subicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+              <span>Lista de Usuarios</span>
+            </a>
+          </div>
+        </div>
       </div>
     </nav>
 

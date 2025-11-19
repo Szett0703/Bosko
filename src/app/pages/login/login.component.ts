@@ -64,6 +64,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     const { email, password, rememberMe } = this.loginForm.value;
     const credentials = { email, password };
 
+    // 🔍 DEBUG: Ver exactamente qué se está enviando
+    console.log('🔵 LOGIN DEBUG - URL:', 'https://localhost:5006/api/auth/login');
+    console.log('🔵 LOGIN DEBUG - Credentials:', JSON.stringify(credentials, null, 2));
+    console.log('🔵 LOGIN DEBUG - Email:', email);
+    console.log('🔵 LOGIN DEBUG - Password length:', password?.length);
+
     // Save email if remember me is checked
     if (rememberMe) {
       localStorage.setItem('bosko-remember-email', email);
@@ -87,6 +93,13 @@ export class LoginComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.isLoading = false;
+
+        // 🔴 DEBUG: Ver error completo
+        console.error('❌ LOGIN ERROR - Status:', err.status);
+        console.error('❌ LOGIN ERROR - Message:', err.message);
+        console.error('❌ LOGIN ERROR - Error Body:', err.error);
+        console.error('❌ LOGIN ERROR - Full Error:', err);
+
         this.loginError = this.getApiErrorMessage(err);
       }
     });

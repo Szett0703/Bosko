@@ -3,7 +3,10 @@
 ## 🎯 Project Overview
 - **E-commerce platform** for Bosko clothing brand with modern, professional UI/UX
 - Built with **Angular CLI v19.2.13** (standalone components) + **Tailwind CSS**
-- **Backend Integration**: ASP.NET Core API on `https://localhost:5006` (documented in `comunicacion-backend/`)
+- **Backend Integration**: ASP.NET Core API on `https://localhost:5006` 
+  - **📋 Backend Rules:** `comunicacion-backend/INSTRUCCIONES-BACKEND.md` - Manual completo para el equipo backend
+  - **📗 API Reference:** `comunicacion-backend/RESUMEN-APIS-IMPLEMENTADAS.md` - Todos los endpoints documentados
+  - **📙 Orders System:** `comunicacion-backend/ORDERS-SYSTEM.md` - Sistema de órdenes detallado
 - **Design System**: Blue gradient theme (`#3b82f6` to `#2563eb`) with white accents
 - **Architecture**: Feature-based structure with pages, components, services, guards, interceptors
 - Main source: `src/app/` with modular organization (pages/, components/, services/, admin/)
@@ -16,6 +19,8 @@
 - **Error checking:** Always run `get_errors` before starting server
 - **Fix & run:** Correct TypeScript errors immediately, then start server
 - **Clean cache:** Delete `.angular/` folder if encountering build cache issues
+- **🔴 MANDATORY:** After completing ANY task, ALWAYS run `npm start` and fix ALL errors until the server starts successfully without any errors
+- **⚠️ IMPORTANT:** Before running `npm start`, ALWAYS check if the server is already running by looking at terminal output. If you see "Port XXXX is already in use", the server is running - DO NOT start it again. Just verify with `get_errors` that there are no compilation issues.
 
 ### **Component Generation**
 ```bash
@@ -185,11 +190,23 @@ export const API_ENDPOINTS = {
 };
 ```
 
-### **Backend Documentation**
-- **Main docs:** `comunicacion-backend/ADMIN-PANEL-ENDPOINTS.md`
-- **Auth endpoints:** Login, register, forgot password, reset password
-- **Admin endpoints:** Dashboard stats, orders, products, categories, users
-- **All endpoints** documented with request/response examples, authorization levels
+### **Backend Documentation & Communication**
+- **📋 Backend Team Instructions:** `comunicacion-backend/INSTRUCCIONES-BACKEND.md`
+  - Standards, naming conventions, JWT authentication
+  - Error handling, logging, validation rules
+  - Database schema, Entity Framework configuration
+  - Complete examples (OrderService, Controller, DTOs)
+- **📗 API Reference:** `comunicacion-backend/RESUMEN-APIS-IMPLEMENTADAS.md`
+  - All endpoints with request/response examples
+  - Status codes, authentication requirements
+  - Frontend service mapping
+- **📙 Orders System:** `comunicacion-backend/ORDERS-SYSTEM.md`
+  - Complete order flow (create, view, edit, cancel)
+  - Database tables, validations, business rules
+- **Communication Protocol:**
+  - Backend documents endpoints in `comunicacion-backend/`
+  - Frontend reports 500 errors with formatted console logs
+  - All API contracts defined with JSON examples
 
 ### **Service Pattern**
 ```typescript
@@ -226,6 +243,15 @@ export class ProductService {
 3. ✅ **Include context** in replacements (3-5 lines before/after)
 4. ✅ **Test incrementally** - verify compilation after major changes
 5. ✅ **Match existing patterns** - consistent with codebase style
+
+### **After Completing Work**
+1. ✅ **🔴 MANDATORY: Check if server is running** - Look at terminal output for "Port XXXX is already in use" before attempting `npm start`
+2. ✅ **🔴 MANDATORY: Run `npm start`** only if server is NOT running, OR run `get_errors` if server is already running
+3. ✅ **🔴 MANDATORY: Fix ALL errors iteratively** until server runs without any errors
+4. ✅ **Never declare task complete** if there are compilation errors
+5. ✅ **Test in browser** if UI changes were made
+6. ✅ **Verify functionality** works as expected
+7. ✅ **Document backend needs** if API integration required
 
 ### **Common Errors to Avoid**
 - ❌ **Syntax errors:** Missing commas, extra commas in arrays/objects
@@ -269,6 +295,19 @@ component-name/
 
 ## 🎯 Communication Guidelines
 
+### **Working with Backend Team**
+- ✅ **Follow backend standards:** Review `comunicacion-backend/INSTRUCCIONES-BACKEND.md` to understand their architecture
+- ✅ **Consistent naming:** Backend uses lowercase states (`pending`, `processing`) and snake_case payment methods (`credit_card`)
+- ✅ **API Response Format:** All endpoints return `{ success: boolean, message: string, data: T }`
+- ✅ **Date handling:** Backend sends ISO 8601 strings (`"2025-11-18T14:30:00Z"`), not Date objects
+- ✅ **Authentication:** JWT in `Authorization: Bearer {token}` header (handled by interceptor)
+- ✅ **Error codes:** 
+  - 400 = Bad Request (validation errors)
+  - 401 = Unauthorized (no token/invalid token)
+  - 403 = Forbidden (insufficient permissions)
+  - 404 = Not Found (resource doesn't exist)
+  - 500 = Internal Server Error (backend issue - report with formatted log)
+
 ### **Documentation for Backend**
 - ✅ **Always create docs** when backend endpoints are needed
 - ✅ **Store in:** `comunicacion-backend/` folder
@@ -296,6 +335,9 @@ component-name/
 - ✅ Complete one task fully before moving to next
 - ✅ Verify each step compiles without errors
 - ✅ Document backend requirements as you go
+- ✅ **ALWAYS run `npm start` after completing ANY task**
+- ✅ **Fix ALL compilation errors until server runs without errors**
+- ✅ **Never leave broken code - iterate until it works**
 
 ### **Creative Freedom**
 - ✅ User grants freedom to design modern, professional UIs

@@ -73,6 +73,93 @@
         </svg>
         <span class="category-name" *ngIf="!isCollapsed">Collections</span>
       </a>
+
+      <!-- Admin Panel Menu (Only visible for Admin role) -->
+      <div class="admin-menu-container" *ngIf="isAdmin()">
+        <button
+          (click)="toggleAdminMenu()"
+          class="category-link admin-link"
+          [class.active]="isAdminMenuOpen"
+          title="Panel de Admin">
+          <svg class="category-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+          </svg>
+          <span class="category-name" *ngIf="!isCollapsed">Panel de Admin</span>
+          <svg
+            class="arrow-icon"
+            *ngIf="!isCollapsed"
+            [class.rotated]="isAdminMenuOpen"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+
+        <!-- Admin Submenu -->
+        <div class="admin-submenu" *ngIf="isAdminMenuOpen && !isCollapsed">
+          <a
+            routerLink="/admin"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            (click)="close()"
+            class="submenu-link"
+            title="Dashboard">
+            <svg class="submenu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z"></path>
+            </svg>
+            <span class="submenu-text">Dashboard</span>
+          </a>
+
+          <a
+            routerLink="/admin/orders"
+            routerLinkActive="active"
+            (click)="close()"
+            class="submenu-link"
+            title="Pedidos">
+            <svg class="submenu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+            </svg>
+            <span class="submenu-text">Pedidos</span>
+          </a>
+
+          <a
+            routerLink="/admin/products"
+            routerLinkActive="active"
+            (click)="close()"
+            class="submenu-link"
+            title="Productos">
+            <svg class="submenu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+            <span class="submenu-text">Productos</span>
+          </a>
+
+          <a
+            routerLink="/admin/categories"
+            routerLinkActive="active"
+            (click)="close()"
+            class="submenu-link"
+            title="Categorías">
+            <svg class="submenu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+            </svg>
+            <span class="submenu-text">Categorías</span>
+          </a>
+
+          <a
+            routerLink="/admin/users"
+            routerLinkActive="active"
+            (click)="close()"
+            class="submenu-link"
+            title="Usuarios">
+            <svg class="submenu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+            <span class="submenu-text">Usuarios</span>
+          </a>
+        </div>
+      </div>
     </nav>    <!-- Promotional Banner (only when expanded) -->
     <div class="promo-banner" *ngIf="!isCollapsed">
       <div class="promo-gradient">

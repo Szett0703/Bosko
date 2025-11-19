@@ -57,11 +57,15 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(
-      `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.auth.login}`,
-      credentials
-    ).pipe(
+    const url = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.auth.login}`;
+
+    // 🔍 DEBUG: Ver URL y body antes de enviar
+    console.log('🟢 AUTH SERVICE - Login URL:', url);
+    console.log('🟢 AUTH SERVICE - Request Body:', JSON.stringify(credentials, null, 2));
+
+    return this.http.post<AuthResponse>(url, credentials).pipe(
       tap(response => {
+        console.log('✅ AUTH SERVICE - Login exitoso:', response);
         this.setToken(response.token);
         this.currentUserSubject.next(response.user);
         this.loggedInSignal.set(true);
