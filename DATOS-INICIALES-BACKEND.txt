@@ -1,0 +1,358 @@
+================================================================================
+CONFIGURACIÓN DE DATOS INICIALES PARA BOSKO - E-COMMERCE DE ROPA
+================================================================================
+
+FECHA: Noviembre 19, 2025
+PROYECTO: Bosko Frontend + Backend Integration
+
+
+================================================================================
+1. USUARIO ADMIN
+================================================================================
+
+Email del admin: admin@bosko.com
+Nombre del admin: Santiago Admin
+Contraseña (sin hashear): Admin@Bosko2025
+Rol: Admin
+
+
+================================================================================
+2. USUARIOS NORMALES
+================================================================================
+
+Cantidad: 5 usuarios
+
+Usuario 1:
+  Email: cliente1@bosko.com
+  Nombre: María García
+  Contraseña: Cliente@123
+  Rol: Customer
+
+Usuario 2:
+  Email: cliente2@bosko.com
+  Nombre: Juan Pérez
+  Contraseña: Cliente@123
+  Rol: Customer
+
+Usuario 3:
+  Email: cliente3@bosko.com
+  Nombre: Ana Rodríguez
+  Contraseña: Cliente@123
+  Rol: Customer
+
+Usuario 4:
+  Email: cliente4@bosko.com
+  Nombre: Carlos López
+  Contraseña: Cliente@123
+  Rol: Customer
+
+Usuario 5:
+  Email: cliente5@bosko.com
+  Nombre: Laura Martínez
+  Contraseña: Cliente@123
+  Rol: Customer
+
+
+================================================================================
+3. CATEGORÍAS (6 categorías para e-commerce de ropa)
+================================================================================
+
+1. Hombres
+2. Mujeres
+3. Niños
+4. Accesorios
+5. Calzado
+6. Deportiva
+
+
+================================================================================
+4. PRODUCTOS POR CATEGORÍA (5 productos por categoría = 30 productos totales)
+================================================================================
+
+--- CATEGORÍA: HOMBRES ---
+
+1. Camisa Casual Azul
+   Precio: $45.00
+   Stock: 50
+   Descripción: Camisa casual de algodón 100%, perfecta para el día a día
+
+2. Jeans Slim Fit Negro
+   Precio: $65.00
+   Stock: 40
+   Descripción: Jeans ajustados de mezclilla premium con diseño moderno
+
+3. Chaqueta de Cuero
+   Precio: $120.00
+   Stock: 25
+   Descripción: Chaqueta de cuero genuino con forro interior
+
+4. Suéter Gris Clásico
+   Precio: $55.00
+   Stock: 45
+   Descripción: Suéter de lana suave ideal para clima frío
+
+5. Pantalón Chino Beige
+   Precio: $50.00
+   Stock: 35
+   Descripción: Pantalón chino elegante para ocasiones casuales
+
+
+--- CATEGORÍA: MUJERES ---
+
+1. Vestido Floral Verano
+   Precio: $75.00
+   Stock: 30
+   Descripción: Vestido ligero con estampado floral, perfecto para verano
+
+2. Blusa Elegante Blanca
+   Precio: $40.00
+   Stock: 55
+   Descripción: Blusa de seda sintética con diseño elegante
+
+3. Jeans Skinny Azul
+   Precio: $60.00
+   Stock: 45
+   Descripción: Jeans ajustados de mezclilla elastizada
+
+4. Abrigo Largo Gris
+   Precio: $130.00
+   Stock: 20
+   Descripción: Abrigo largo de lana para invierno
+
+5. Falda Midi Negra
+   Precio: $45.00
+   Stock: 40
+   Descripción: Falda midi versátil para cualquier ocasión
+
+
+--- CATEGORÍA: NIÑOS ---
+
+1. Camiseta Estampada
+   Precio: $25.00
+   Stock: 60
+   Descripción: Camiseta de algodón con estampados divertidos
+
+2. Pantalón Deportivo
+   Precio: $30.00
+   Stock: 50
+   Descripción: Pantalón cómodo para actividades deportivas
+
+3. Sudadera con Capucha
+   Precio: $35.00
+   Stock: 45
+   Descripción: Sudadera cálida con capucha ajustable
+
+4. Shorts Casuales
+   Precio: $20.00
+   Stock: 55
+   Descripción: Shorts ligeros para el verano
+
+5. Pijama de Algodón
+   Precio: $28.00
+   Stock: 40
+   Descripción: Pijama suave de algodón 100%
+
+
+--- CATEGORÍA: ACCESORIOS ---
+
+1. Gorra Snapback
+   Precio: $22.00
+   Stock: 70
+   Descripción: Gorra ajustable con diseño moderno
+
+2. Bufanda de Lana
+   Precio: $18.00
+   Stock: 50
+   Descripción: Bufanda tejida perfecta para invierno
+
+3. Cinturón de Cuero
+   Precio: $30.00
+   Stock: 60
+   Descripción: Cinturón clásico de cuero genuino
+
+4. Gafas de Sol
+   Precio: $45.00
+   Stock: 40
+   Descripción: Gafas con protección UV400
+
+5. Cartera Minimalista
+   Precio: $35.00
+   Stock: 45
+   Descripción: Cartera compacta de cuero sintético
+
+
+--- CATEGORÍA: CALZADO ---
+
+1. Zapatillas Deportivas
+   Precio: $85.00
+   Stock: 35
+   Descripción: Zapatillas cómodas para correr y entrenar
+
+2. Botas Chelsea
+   Precio: $95.00
+   Stock: 30
+   Descripción: Botas elegantes de cuero sintético
+
+3. Sandalias de Verano
+   Precio: $40.00
+   Stock: 50
+   Descripción: Sandalias ligeras y cómodas
+
+4. Zapatos Oxford
+   Precio: $110.00
+   Stock: 25
+   Descripción: Zapatos formales de cuero
+
+5. Tenis Casuales
+   Precio: $70.00
+   Stock: 40
+   Descripción: Tenis versátiles para uso diario
+
+
+--- CATEGORÍA: DEPORTIVA ---
+
+1. Conjunto Deportivo
+   Precio: $65.00
+   Stock: 35
+   Descripción: Set completo de ropa deportiva
+
+2. Leggings de Yoga
+   Precio: $35.00
+   Stock: 50
+   Descripción: Leggings elásticos para yoga y pilates
+
+3. Camiseta Técnica
+   Precio: $30.00
+   Stock: 55
+   Descripción: Camiseta transpirable con tecnología dry-fit
+
+4. Short Deportivo
+   Precio: $28.00
+   Stock: 60
+   Descripción: Short ligero para entrenamiento
+
+5. Chaqueta Running
+   Precio: $55.00
+   Stock: 40
+   Descripción: Chaqueta impermeable para correr
+
+
+================================================================================
+5. DIRECCIONES (ADDRESSES)
+================================================================================
+
+Respuesta: SÍ
+
+Configuración:
+- Cada usuario normal tendrá 2 direcciones
+- 1 dirección marcada como PREDETERMINADA (isDefault: true)
+- 1 dirección alternativa (isDefault: false)
+
+Total de direcciones: 10 (5 usuarios × 2 direcciones)
+
+Ejemplos de direcciones para Usuario 1 (María García):
+
+Dirección 1 (Predeterminada):
+  Street: Calle Principal 123
+  City: Madrid
+  State: Madrid
+  ZipCode: 28001
+  Country: España
+  IsDefault: true
+
+Dirección 2 (Alternativa):
+  Street: Avenida Secundaria 456
+  City: Madrid
+  State: Madrid
+  ZipCode: 28002
+  Country: España
+  IsDefault: false
+
+
+================================================================================
+6. ÓRDENES DE EJEMPLO (ORDERS)
+================================================================================
+
+Respuesta: SÍ
+
+Cantidad: 15 órdenes (3 órdenes por usuario)
+
+Distribución por estados:
+- 5 órdenes en estado "pending" (Pendiente)
+- 3 órdenes en estado "processing" (Procesando)
+- 4 órdenes en estado "shipped" (Enviado)
+- 2 órdenes en estado "delivered" (Entregado)
+- 1 orden en estado "cancelled" (Cancelado)
+
+Características de las órdenes:
+- Cada orden contiene entre 2-4 productos
+- Totales variados entre $50 - $300
+- Fechas de creación en los últimos 30 días
+- Métodos de pago: credit_card, debit_card, paypal (variados)
+
+
+================================================================================
+RESUMEN EJECUTIVO
+================================================================================
+
+┌─────────────────────────┬──────────────────────────────────────┐
+│ Item                    │ Cantidad/Decisión                    │
+├─────────────────────────┼──────────────────────────────────────┤
+│ Admins                  │ 1 (admin@bosko.com)                  │
+│ Usuarios normales       │ 5                                    │
+│ Categorías              │ 6 (Hombres, Mujeres, Niños, etc.)    │
+│ Productos totales       │ 30 (5 por categoría)                 │
+│ Direcciones totales     │ 10 (2 por usuario, 1 predeterminada) │
+│ Órdenes de ejemplo      │ 15 (estados variados)                │
+└─────────────────────────┴──────────────────────────────────────┘
+
+
+================================================================================
+NOTAS IMPORTANTES PARA EL BACKEND
+================================================================================
+
+1. CONTRASEÑAS: Las contraseñas proporcionadas son sin hashear. El backend
+   debe aplicar el algoritmo de hash correspondiente (BCrypt recomendado).
+
+2. ROLES: Implementar correctamente:
+   - Admin: Acceso total al panel de administración
+   - Customer: Acceso a funciones de cliente (compras, perfil, órdenes)
+
+3. ESTADOS DE ÓRDENES: Usar exactamente estos valores en minúsculas:
+   - pending, processing, shipped, delivered, cancelled
+
+4. MÉTODOS DE PAGO: Usar snake_case:
+   - credit_card, debit_card, paypal
+
+5. FECHAS: Formato ISO 8601 (ejemplo: 2025-11-19T14:30:00Z)
+
+6. IMÁGENES: Los productos deben tener URLs de imágenes placeholder o reales
+   en el campo ImageUrl.
+
+7. VALIDACIONES:
+   - Emails únicos
+   - Stock no negativo
+   - Precios mayores a 0
+   - Al menos una dirección predeterminada por usuario
+
+
+================================================================================
+PROPÓSITO DE ESTOS DATOS
+================================================================================
+
+Esta configuración proporcionará datos suficientes para probar:
+
+✅ Panel de administración de órdenes
+✅ Filtros por estado y búsqueda
+✅ Historial de órdenes del usuario
+✅ Estadísticas del dashboard (ventas, productos, clientes)
+✅ Funcionalidad de direcciones múltiples
+✅ Gestión de productos y categorías
+✅ Sistema de autenticación y roles
+✅ Carrito de compras y checkout
+✅ Perfil de usuario completo
+
+
+================================================================================
+FIN DEL DOCUMENTO
+================================================================================
