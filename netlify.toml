@@ -1,5 +1,5 @@
 [build]
-  publish = "dist/"
+  publish = "dist/bosko/browser"
   command = "npm run build"
 
 [build.environment]
