@@ -1,6 +1,8 @@
+import { environment } from '../../environments/environment';
+
 export const API_CONFIG = {
-  baseUrl: 'https://localhost:5006/api',
-  backendUrl: 'https://localhost:5006', // URL base para imágenes
+  baseUrl: environment.apiUrl,
+  backendUrl: environment.backendUrl,
   endpoints: {
     products: '/products',
     categories: '/categories',
